@@ -1,3 +1,272 @@
+<!--<!DOCTYPE html>-->
+<!--<html xmlns:th="http://www.thymeleaf.org"-->
+<!--      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>Products - GreenBasket</title>-->
+
+<!--    &lt;!&ndash; Bootstrap 5.3 CSS &ndash;&gt;-->
+<!--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">-->
+<!--    &lt;!&ndash; Bootstrap Icons &ndash;&gt;-->
+<!--    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">-->
+<!--    &lt;!&ndash; Google Fonts &ndash;&gt;-->
+<!--    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">-->
+<!--    &lt;!&ndash; Custom CSS &ndash;&gt;-->
+<!--    <link th:href="@{/css/style.css}" rel="stylesheet">-->
+<!--</head>-->
+<!--<body>-->
+<!--&lt;!&ndash; Navigation &ndash;&gt;-->
+<!--<nav class="navbar navbar-expand-lg navbar-dark bg-gradient-primary sticky-top shadow-sm">-->
+<!--    <div class="container-fluid px-4">-->
+<!--        <a class="navbar-brand d-flex align-items-center" th:href="@{/}">-->
+<!--            <div class="brand-icon me-2">-->
+<!--                <i class="bi bi-basket2-fill fs-3"></i>-->
+<!--            </div>-->
+<!--            <span class="brand-text fw-bold">GreenBasket</span>-->
+<!--        </a>-->
+
+<!--        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"-->
+<!--                data-bs-target="#navbarNav">-->
+<!--            <span class="navbar-toggler-icon"></span>-->
+<!--        </button>-->
+
+<!--        <div class="collapse navbar-collapse" id="navbarNav">-->
+<!--            <ul class="navbar-nav ms-auto align-items-center">-->
+<!--                <li class="nav-item">-->
+<!--                    <a class="nav-link px-3" th:href="@{/}">-->
+<!--                        <i class="bi bi-house-door me-1"></i> Home-->
+<!--                    </a>-->
+<!--                </li>-->
+<!--                <li class="nav-item">-->
+<!--                    <a class="nav-link px-3 active" th:href="@{/products}">-->
+<!--                        <i class="bi bi-grid me-1"></i> Products-->
+<!--                    </a>-->
+<!--                </li>-->
+
+<!--                &lt;!&ndash; Customer Menu &ndash;&gt;-->
+<!--                <li class="nav-item" sec:authorize="hasRole('CUSTOMER')">-->
+<!--                    <a class="nav-link px-3 position-relative" th:href="@{/cart}">-->
+<!--                        <i class="bi bi-cart3 fs-5"></i>-->
+<!--                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"-->
+<!--                              id="cart-badge" style="display: none;">0</span>-->
+<!--                    </a>-->
+<!--                </li>-->
+<!--                <li class="nav-item" sec:authorize="hasRole('CUSTOMER')">-->
+<!--                    <a class="nav-link px-3" th:href="@{/my-orders}">-->
+<!--                        <i class="bi bi-box-seam me-1"></i> My Orders-->
+<!--                    </a>-->
+<!--                </li>-->
+
+<!--                &lt;!&ndash; Salesperson Menu &ndash;&gt;-->
+<!--                <li class="nav-item" sec:authorize="hasRole('SALESPERSON')">-->
+<!--                    <a class="nav-link px-3" th:href="@{/sales/dashboard}">-->
+<!--                        <i class="bi bi-speedometer2 me-1"></i> Dashboard-->
+<!--                    </a>-->
+<!--                </li>-->
+
+<!--                &lt;!&ndash; Admin Menu &ndash;&gt;-->
+<!--                <li class="nav-item" sec:authorize="hasRole('ADMIN')">-->
+<!--                    <a class="nav-link px-3" th:href="@{/admin/dashboard}">-->
+<!--                        <i class="bi bi-speedometer2 me-1"></i> Admin Panel-->
+<!--                    </a>-->
+<!--                </li>-->
+
+<!--                &lt;!&ndash; Authenticated User &ndash;&gt;-->
+<!--                <li class="nav-item dropdown ms-2" sec:authorize="isAuthenticated()">-->
+<!--                    <a class="nav-link dropdown-toggle btn btn-outline-light rounded-pill px-3"-->
+<!--                       href="#" role="button" data-bs-toggle="dropdown">-->
+<!--                        <i class="bi bi-person-circle me-1"></i>-->
+<!--                        <span th:text="${currentUser?.fullName}">User</span>-->
+<!--                    </a>-->
+<!--                    <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2">-->
+<!--                        <li>-->
+<!--                            <form th:action="@{/logout}" method="post">-->
+<!--                                <button type="submit" class="dropdown-item text-danger">-->
+<!--                                    <i class="bi bi-box-arrow-right me-2"></i> Logout-->
+<!--                                </button>-->
+<!--                            </form>-->
+<!--                        </li>-->
+<!--                    </ul>-->
+<!--                </li>-->
+
+<!--                &lt;!&ndash; Guest Menu &ndash;&gt;-->
+<!--                <li class="nav-item ms-2" sec:authorize="!isAuthenticated()">-->
+<!--                    <a class="btn btn-outline-light rounded-pill px-4" th:href="@{/login}">-->
+<!--                        <i class="bi bi-box-arrow-in-right me-1"></i> Login-->
+<!--                    </a>-->
+<!--                </li>-->
+<!--                <li class="nav-item ms-2" sec:authorize="!isAuthenticated()">-->
+<!--                    <a class="btn btn-light rounded-pill px-4" th:href="@{/register}">-->
+<!--                        Sign Up-->
+<!--                    </a>-->
+<!--                </li>-->
+<!--            </ul>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</nav>-->
+
+<!--&lt;!&ndash; Products Page Content &ndash;&gt;-->
+<!--<div class="container my-5">-->
+<!--    &lt;!&ndash; Page Header &ndash;&gt;-->
+<!--    <div class="row mb-4">-->
+<!--        <div class="col-md-8">-->
+<!--            <h1 class="fw-bold mb-2">-->
+<!--                <i class="bi bi-grid text-success me-2"></i> All Products-->
+<!--            </h1>-->
+<!--            <p class="text-muted">Browse our collection of fresh vegetables</p>-->
+<!--        </div>-->
+<!--        <div class="col-md-4">-->
+<!--            &lt;!&ndash; Search Form &ndash;&gt;-->
+<!--            <form th:action="@{/products}" method="get">-->
+<!--                <div class="input-group">-->
+<!--                    <input type="text" class="form-control" name="search"-->
+<!--                           placeholder="Search products..."-->
+<!--                           th:value="${search}">-->
+<!--                    <button class="btn btn-success" type="submit">-->
+<!--                        <i class="bi bi-search"></i> Search-->
+<!--                    </button>-->
+<!--                </div>-->
+<!--            </form>-->
+<!--        </div>-->
+<!--    </div>-->
+
+<!--    &lt;!&ndash; Search Results Info &ndash;&gt;-->
+<!--    <div th:if="${search != null and search != ''}" class="alert alert-info mb-4">-->
+<!--        <i class="bi bi-info-circle me-2"></i>-->
+<!--        Showing results for: <strong th:text="${search}"></strong>-->
+<!--        <a th:href="@{/products}" class="btn btn-sm btn-outline-info ms-2">Clear Search</a>-->
+<!--    </div>-->
+
+<!--    &lt;!&ndash; Products Grid &ndash;&gt;-->
+<!--    <div th:if="${products != null and !products.isEmpty()}" class="row g-4">-->
+<!--        <div class="col-lg-3 col-md-4 col-sm-6" th:each="product : ${products}">-->
+<!--            <div class="card product-card h-100 border-0 shadow-sm">-->
+<!--                <div class="position-relative overflow-hidden">-->
+<!--                    <img th:src="${product.imageUrl != null and product.imageUrl != ''} ? ${product.imageUrl} : 'https://images.unsplash.com/photo-1518843875459-f738682238a6?w=400'"-->
+<!--                         class="card-img-top product-image"-->
+<!--                         th:alt="${product.name}">-->
+<!--                    <div class="product-badge position-absolute top-0 end-0 m-3">-->
+<!--                            <span class="badge bg-success rounded-pill" th:if="${product.stockKg > 50}">-->
+<!--                                <i class="bi bi-check-circle me-1"></i> In Stock-->
+<!--                            </span>-->
+<!--                        <span class="badge bg-warning text-dark rounded-pill" th:if="${product.stockKg <= 50 and product.stockKg > 0}">-->
+<!--                                <i class="bi bi-exclamation-circle me-1"></i> Low Stock-->
+<!--                            </span>-->
+<!--                        <span class="badge bg-danger rounded-pill" th:if="${product.stockKg == 0}">-->
+<!--                                <i class="bi bi-x-circle me-1"></i> Out of Stock-->
+<!--                            </span>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                <div class="card-body">-->
+<!--                    <div class="d-flex justify-content-between align-items-start mb-2">-->
+<!--                        <h6 class="card-title fw-bold mb-0" th:text="${product.name}">Product Name</h6>-->
+<!--                        <span class="text-muted small" th:text="${product.stockKg + ' kg'}">100 kg</span>-->
+<!--                    </div>-->
+<!--                    <p class="card-text text-muted small mb-3" th:text="${product.description}">Product Description</p>-->
+
+<!--                    <div class="price-section mb-3">-->
+<!--                        <div class="d-flex align-items-baseline">-->
+<!--                            <h5 class="fw-bold text-success mb-0">-->
+<!--                                ₹<span th:text="${product.retailPricePerKg}">0</span>-->
+<!--                            </h5>-->
+<!--                            <span class="text-muted ms-2 small">/kg</span>-->
+<!--                        </div>-->
+<!--                        <div th:if="${currentUser != null and currentUser.isWholesale}" class="mt-2">-->
+<!--                                <span class="badge bg-primary-subtle text-primary">-->
+<!--                                    Wholesale: ₹<span th:text="${product.wholesalePricePerKg}">0</span>/kg-->
+<!--                                    (Min: <span th:text="${product.minWholesaleQuantityKg}">0</span> kg)-->
+<!--                                </span>-->
+<!--                        </div>-->
+<!--                    </div>-->
+
+<!--                    <div class="d-grid gap-2">-->
+<!--                        <a th:href="@{/products/{id}(id=${product.id})}"-->
+<!--                           class="btn btn-outline-success btn-sm rounded-pill">-->
+<!--                            <i class="bi bi-eye me-1"></i> View Details-->
+<!--                        </a>-->
+<!--                        <button class="btn btn-success btn-sm rounded-pill"-->
+<!--                                th:if="${currentUser != null and currentUser.role.name() == 'CUSTOMER' and product.stockKg > 0}"-->
+<!--                                th:onclick="'addToCart(' + ${product.id} + ', \'' + ${product.name} + '\', 1, ' +-->
+<!--                                               ${product.retailPricePerKg} + ', ' + ${product.wholesalePricePerKg} + ', ' +-->
+<!--                                               ${product.minWholesaleQuantityKg} + ')'">-->
+<!--                            <i class="bi bi-cart-plus me-1"></i> Add to Cart-->
+<!--                        </button>-->
+<!--                        <button class="btn btn-secondary btn-sm rounded-pill" disabled-->
+<!--                                th:if="${product.stockKg == 0}">-->
+<!--                            <i class="bi bi-x-circle me-1"></i> Out of Stock-->
+<!--                        </button>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+
+<!--    &lt;!&ndash; No Products Found &ndash;&gt;-->
+<!--    <div th:if="${products == null or products.isEmpty()}" class="text-center py-5">-->
+<!--        <i class="bi bi-inbox display-1 text-muted"></i>-->
+<!--        <h3 class="mt-3">No Products Found</h3>-->
+<!--        <p class="text-muted">-->
+<!--                <span th:if="${search != null and search != ''}">-->
+<!--                    No products match your search. Try different keywords.-->
+<!--                </span>-->
+<!--            <span th:if="${search == null or search == ''}">-->
+<!--                    There are no products available at the moment.-->
+<!--                </span>-->
+<!--        </p>-->
+<!--        <a th:href="@{/products}" class="btn btn-success rounded-pill mt-3">-->
+<!--            <i class="bi bi-arrow-left me-2"></i> View All Products-->
+<!--        </a>-->
+<!--    </div>-->
+<!--</div>-->
+
+<!--&lt;!&ndash; Footer &ndash;&gt;-->
+<!--<footer class="bg-dark text-white py-5 mt-5">-->
+<!--    <div class="container">-->
+<!--        <div class="row">-->
+<!--            <div class="col-md-4 mb-4">-->
+<!--                <h5 class="mb-3">-->
+<!--                    <i class="bi bi-basket2-fill text-success"></i> GreenBasket-->
+<!--                </h5>-->
+<!--                <p class="text-muted">Your trusted source for fresh vegetables.</p>-->
+<!--            </div>-->
+<!--            <div class="col-md-4 mb-4">-->
+<!--                <h6 class="mb-3">Quick Links</h6>-->
+<!--                <ul class="list-unstyled">-->
+<!--                    <li class="mb-2"><a th:href="@{/}" class="text-muted text-decoration-none">Home</a></li>-->
+<!--                    <li class="mb-2"><a th:href="@{/products}" class="text-muted text-decoration-none">Products</a></li>-->
+<!--                </ul>-->
+<!--            </div>-->
+<!--            <div class="col-md-4 mb-4">-->
+<!--                <h6 class="mb-3">Connect With Us</h6>-->
+<!--                <div class="d-flex gap-3">-->
+<!--                    <a href="#" class="text-white fs-4"><i class="bi bi-facebook"></i></a>-->
+<!--                    <a href="#" class="text-white fs-4"><i class="bi bi-twitter"></i></a>-->
+<!--                    <a href="#" class="text-white fs-4"><i class="bi bi-instagram"></i></a>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--        <hr class="border-secondary my-4">-->
+<!--        <div class="text-center text-muted">-->
+<!--            <small>&copy; 2025 GreenBasket. All rights reserved.</small>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</footer>-->
+
+<!--&lt;!&ndash; Bootstrap JS &ndash;&gt;-->
+<!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>-->
+<!--&lt;!&ndash; Custom JS &ndash;&gt;-->
+<!--<script th:src="@{/js/cart.js}"></script>-->
+
+<!--<script th:inline="javascript">-->
+<!--    const isWholesaleCustomer = /*[[${currentUser?.isWholesale}]]*/ false;-->
+<!--    localStorage.setItem('isWholesale', isWholesaleCustomer);-->
+
+<!--    // Update cart badge on page load-->
+<!--    document.addEventListener('DOMContentLoaded', updateCartBadge);-->
+<!--</script>-->
+<!--</body>-->
+<!--</html>-->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
@@ -6,13 +275,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Products - GreenBasket</title>
 
-    <!-- Bootstrap 5.3 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Custom CSS -->
     <link th:href="@{/css/style.css}" rel="stylesheet">
 </head>
 <body>
@@ -26,8 +291,7 @@
             <span class="brand-text fw-bold">GreenBasket</span>
         </a>
 
-        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbarNav">
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
 
@@ -55,13 +319,6 @@
                 <li class="nav-item" sec:authorize="hasRole('CUSTOMER')">
                     <a class="nav-link px-3" th:href="@{/my-orders}">
                         <i class="bi bi-box-seam me-1"></i> My Orders
-                    </a>
-                </li>
-
-                <!-- Salesperson Menu -->
-                <li class="nav-item" sec:authorize="hasRole('SALESPERSON')">
-                    <a class="nav-link px-3" th:href="@{/sales/dashboard}">
-                        <i class="bi bi-speedometer2 me-1"></i> Dashboard
                     </a>
                 </li>
 
@@ -96,129 +353,158 @@
                         <i class="bi bi-box-arrow-in-right me-1"></i> Login
                     </a>
                 </li>
-                <li class="nav-item ms-2" sec:authorize="!isAuthenticated()">
-                    <a class="btn btn-light rounded-pill px-4" th:href="@{/register}">
-                        Sign Up
-                    </a>
-                </li>
             </ul>
         </div>
     </div>
 </nav>
 
-<!-- Products Page Content -->
-<div class="container my-5">
-    <!-- Page Header -->
-    <div class="row mb-4">
-        <div class="col-md-8">
-            <h1 class="fw-bold mb-2">
-                <i class="bi bi-grid text-success me-2"></i> All Products
-            </h1>
-            <p class="text-muted">Browse our collection of fresh vegetables</p>
+<!-- Page Header -->
+<div class="bg-light py-4">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col">
+                <h1 class="mb-0">
+                    <i class="bi bi-grid text-success me-2"></i> All Products
+                </h1>
+                <p class="text-muted mb-0">Browse our fresh vegetable collection</p>
+            </div>
+            <div class="col-auto">
+                    <span class="badge bg-success rounded-pill px-3 py-2">
+                        <span th:text="${products.size()}">0</span> Products Available
+                    </span>
+            </div>
         </div>
-        <div class="col-md-4">
-            <!-- Search Form -->
-            <form th:action="@{/products}" method="get">
+    </div>
+</div>
+
+<!-- Products Section -->
+<section class="py-5">
+    <div class="container">
+        <!-- Filters and Search -->
+        <div class="row mb-4">
+            <div class="col-md-6 mb-3">
                 <div class="input-group">
-                    <input type="text" class="form-control" name="search"
-                           placeholder="Search products..."
-                           th:value="${search}">
-                    <button class="btn btn-success" type="submit">
-                        <i class="bi bi-search"></i> Search
-                    </button>
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="bi bi-search"></i>
+                        </span>
+                    <input type="text" class="form-control border-start-0" id="searchInput"
+                           placeholder="Search products...">
                 </div>
-            </form>
+            </div>
+            <div class="col-md-3 mb-3">
+                <select class="form-select" id="categoryFilter">
+                    <option value="">All Categories</option>
+                    <option value="Leafy">Leafy Vegetables</option>
+                    <option value="Root">Root Vegetables</option>
+                    <option value="Fruiting">Fruiting Vegetables</option>
+                    <option value="Beans">Beans & Legumes</option>
+                    <option value="Gourd">Gourds</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            <div class="col-md-3 mb-3">
+                <select class="form-select" id="sortFilter">
+                    <option value="">Sort By</option>
+                    <option value="name-asc">Name (A-Z)</option>
+                    <option value="name-desc">Name (Z-A)</option>
+                    <option value="price-asc">Price (Low to High)</option>
+                    <option value="price-desc">Price (High to Low)</option>
+                </select>
+            </div>
         </div>
-    </div>
 
-    <!-- Search Results Info -->
-    <div th:if="${search != null and search != ''}" class="alert alert-info mb-4">
-        <i class="bi bi-info-circle me-2"></i>
-        Showing results for: <strong th:text="${search}"></strong>
-        <a th:href="@{/products}" class="btn btn-sm btn-outline-info ms-2">Clear Search</a>
-    </div>
-
-    <!-- Products Grid -->
-    <div th:if="${products != null and !products.isEmpty()}" class="row g-4">
-        <div class="col-lg-3 col-md-4 col-sm-6" th:each="product : ${products}">
-            <div class="card product-card h-100 border-0 shadow-sm">
-                <div class="position-relative overflow-hidden">
-                    <img th:src="${product.imageUrl != null and product.imageUrl != ''} ? ${product.imageUrl} : 'https://images.unsplash.com/photo-1518843875459-f738682238a6?w=400'"
-                         class="card-img-top product-image"
-                         th:alt="${product.name}">
-                    <div class="product-badge position-absolute top-0 end-0 m-3">
-                            <span class="badge bg-success rounded-pill" th:if="${product.stockKg > 50}">
-                                <i class="bi bi-check-circle me-1"></i> In Stock
-                            </span>
-                        <span class="badge bg-warning text-dark rounded-pill" th:if="${product.stockKg <= 50 and product.stockKg > 0}">
-                                <i class="bi bi-exclamation-circle me-1"></i> Low Stock
-                            </span>
-                        <span class="badge bg-danger rounded-pill" th:if="${product.stockKg == 0}">
-                                <i class="bi bi-x-circle me-1"></i> Out of Stock
-                            </span>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
-                        <h6 class="card-title fw-bold mb-0" th:text="${product.name}">Product Name</h6>
-                        <span class="text-muted small" th:text="${product.stockKg + ' kg'}">100 kg</span>
-                    </div>
-                    <p class="card-text text-muted small mb-3" th:text="${product.description}">Product Description</p>
-
-                    <div class="price-section mb-3">
-                        <div class="d-flex align-items-baseline">
-                            <h5 class="fw-bold text-success mb-0">
-                                ₹<span th:text="${product.retailPricePerKg}">0</span>
-                            </h5>
-                            <span class="text-muted ms-2 small">/kg</span>
-                        </div>
-                        <div th:if="${currentUser != null and currentUser.isWholesale}" class="mt-2">
-                                <span class="badge bg-primary-subtle text-primary">
-                                    Wholesale: ₹<span th:text="${product.wholesalePricePerKg}">0</span>/kg
-                                    (Min: <span th:text="${product.minWholesaleQuantityKg}">0</span> kg)
+        <!-- Products Grid -->
+        <div th:if="${products != null and !products.isEmpty()}" class="row g-4" id="productsGrid">
+            <div class="col-lg-3 col-md-4 col-sm-6 product-item"
+                 th:each="product : ${products}"
+                 th:data-category="${product.category}"
+                 th:data-name="${product.name}"
+                 th:data-price="${product.retailPricePerKg}">
+                <div class="card product-card h-100 border-0 shadow-sm">
+                    <div class="position-relative overflow-hidden">
+                        <img th:src="${product.imageUrl != null and product.imageUrl != ''} ? ${product.imageUrl} : 'https://images.unsplash.com/photo-1518843875459-f738682238a6?w=400'"
+                             class="card-img-top product-image"
+                             th:alt="${product.name}"
+                             onerror="this.src='https://via.placeholder.com/400x300?text=No+Image'">
+                        <div class="product-badge position-absolute top-0 end-0 m-3">
+                                <span class="badge bg-success rounded-pill shadow" th:if="${product.stockKg > 50}">
+                                    <i class="bi bi-check-circle me-1"></i> In Stock
+                                </span>
+                            <span class="badge bg-warning text-dark rounded-pill shadow" th:if="${product.stockKg <= 50 and product.stockKg > 0}">
+                                    <i class="bi bi-exclamation-circle me-1"></i> Low Stock
+                                </span>
+                            <span class="badge bg-danger rounded-pill shadow" th:if="${product.stockKg == 0}">
+                                    <i class="bi bi-x-circle me-1"></i> Out of Stock
                                 </span>
                         </div>
+                        <div class="product-category position-absolute top-0 start-0 m-3">
+                            <span class="badge bg-dark bg-opacity-75 rounded-pill" th:text="${product.category}">Category</span>
+                        </div>
                     </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h6 class="card-title fw-bold mb-0" th:text="${product.name}">Product</h6>
+                            <span class="text-muted small"><span th:text="${product.stockKg}">0</span> kg</span>
+                        </div>
+                        <p class="card-text text-muted small mb-3 text-truncate"
+                           th:text="${product.description}">Description</p>
 
-                    <div class="d-grid gap-2">
-                        <a th:href="@{/products/{id}(id=${product.id})}"
-                           class="btn btn-outline-success btn-sm rounded-pill">
-                            <i class="bi bi-eye me-1"></i> View Details
-                        </a>
-                        <button class="btn btn-success btn-sm rounded-pill"
-                                th:if="${currentUser != null and currentUser.role.name() == 'CUSTOMER' and product.stockKg > 0}"
-                                th:onclick="'addToCart(' + ${product.id} + ', \'' + ${product.name} + '\', 1, ' +
-                                               ${product.retailPricePerKg} + ', ' + ${product.wholesalePricePerKg} + ', ' +
-                                               ${product.minWholesaleQuantityKg} + ')'">
-                            <i class="bi bi-cart-plus me-1"></i> Add to Cart
-                        </button>
-                        <button class="btn btn-secondary btn-sm rounded-pill" disabled
-                                th:if="${product.stockKg == 0}">
-                            <i class="bi bi-x-circle me-1"></i> Out of Stock
-                        </button>
+                        <div class="price-section mb-3">
+                            <div class="d-flex align-items-baseline">
+                                <h5 class="fw-bold text-success mb-0">
+                                    ₹<span th:text="${product.retailPricePerKg}">0</span>
+                                </h5>
+                                <span class="text-muted ms-2 small">/kg</span>
+                            </div>
+                            <div th:if="${currentUser != null and currentUser.isWholesale}" class="mt-2">
+                                    <span class="badge bg-primary bg-opacity-10 text-primary">
+                                        Wholesale: ₹<span th:text="${product.wholesalePricePerKg}">0</span>/kg
+                                        (Min: <span th:text="${product.minWholesaleQuantityKg}">0</span> kg)
+                                    </span>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <a th:href="@{/products/{id}(id=${product.id})}"
+                               class="btn btn-outline-success btn-sm rounded-pill">
+                                <i class="bi bi-eye me-1"></i> View Details
+                            </a>
+                            <button class="btn btn-success btn-sm rounded-pill add-to-cart-btn"
+                                    sec:authorize="hasRole('CUSTOMER')"
+                                    th:if="${product.stockKg > 0}"
+                                    th:data-id="${product.id}"
+                                    th:data-name="${product.name}"
+                                    th:data-retail="${product.retailPricePerKg}"
+                                    th:data-wholesale="${product.wholesalePricePerKg}"
+                                    th:data-minqty="${product.minWholesaleQuantityKg}">
+                                <i class="bi bi-cart-plus me-1"></i> Add to Cart
+                            </button>
+                            <button class="btn btn-secondary btn-sm rounded-pill" disabled
+                                    th:if="${product.stockKg == 0}">
+                                <i class="bi bi-x-circle me-1"></i> Out of Stock
+                            </button>
+                            <a th:href="@{/login}"
+                               class="btn btn-outline-success btn-sm rounded-pill"
+                               sec:authorize="!isAuthenticated()">
+                                <i class="bi bi-box-arrow-in-right me-1"></i> Login to Purchase
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- No Products Found -->
-    <div th:if="${products == null or products.isEmpty()}" class="text-center py-5">
-        <i class="bi bi-inbox display-1 text-muted"></i>
-        <h3 class="mt-3">No Products Found</h3>
-        <p class="text-muted">
-                <span th:if="${search != null and search != ''}">
-                    No products match your search. Try different keywords.
-                </span>
-            <span th:if="${search == null or search == ''}">
-                    There are no products available at the moment.
-                </span>
-        </p>
-        <a th:href="@{/products}" class="btn btn-success rounded-pill mt-3">
-            <i class="bi bi-arrow-left me-2"></i> View All Products
-        </a>
+        <!-- No Products Found -->
+        <div th:if="${products == null or products.isEmpty()}" class="text-center py-5">
+            <i class="bi bi-inbox display-1 text-muted"></i>
+            <h3 class="mt-3">No Products Available</h3>
+            <p class="text-muted">Check back soon for fresh arrivals!</p>
+            <a th:href="@{/}" class="btn btn-success rounded-pill mt-3">
+                <i class="bi bi-arrow-left me-2"></i> Back to Home
+            </a>
+        </div>
     </div>
-</div>
+</section>
 
 <!-- Footer -->
 <footer class="bg-dark text-white py-5 mt-5">
@@ -253,17 +539,80 @@
     </div>
 </footer>
 
-<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<!-- Custom JS -->
 <script th:src="@{/js/cart.js}"></script>
 
 <script th:inline="javascript">
     const isWholesaleCustomer = /*[[${currentUser?.isWholesale}]]*/ false;
     localStorage.setItem('isWholesale', isWholesaleCustomer);
 
-    // Update cart badge on page load
-    document.addEventListener('DOMContentLoaded', updateCartBadge);
+    document.addEventListener('DOMContentLoaded', function() {
+        updateCartBadge();
+
+        // Add to cart functionality
+        document.querySelectorAll('.add-to-cart-btn').forEach(function(button) {
+            button.addEventListener('click', function() {
+                const productId = parseInt(this.getAttribute('data-id'));
+                const productName = this.getAttribute('data-name');
+                const retailPrice = parseFloat(this.getAttribute('data-retail'));
+                const wholesalePrice = parseFloat(this.getAttribute('data-wholesale'));
+                const minWholesaleQty = parseFloat(this.getAttribute('data-minqty'));
+
+                addToCart(productId, productName, 1, retailPrice, wholesalePrice, minWholesaleQty);
+            });
+        });
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('keyup', filterProducts);
+        document.getElementById('categoryFilter').addEventListener('change', filterProducts);
+        document.getElementById('sortFilter').addEventListener('change', sortProducts);
+    });
+
+    function filterProducts() {
+        const searchValue = document.getElementById('searchInput').value.toLowerCase();
+        const categoryValue = document.getElementById('categoryFilter').value;
+        const products = document.querySelectorAll('.product-item');
+
+        products.forEach(function(product) {
+            const name = product.getAttribute('data-name').toLowerCase();
+            const category = product.getAttribute('data-category');
+
+            const matchesSearch = name.includes(searchValue);
+            const matchesCategory = categoryValue === '' || category === categoryValue;
+
+            product.style.display = matchesSearch && matchesCategory ? '' : 'none';
+        });
+    }
+
+    function sortProducts() {
+        const sortValue = document.getElementById('sortFilter').value;
+        const grid = document.getElementById('productsGrid');
+        const products = Array.from(document.querySelectorAll('.product-item'));
+
+        products.sort(function(a, b) {
+            const nameA = a.getAttribute('data-name').toLowerCase();
+            const nameB = b.getAttribute('data-name').toLowerCase();
+            const priceA = parseFloat(a.getAttribute('data-price'));
+            const priceB = parseFloat(b.getAttribute('data-price'));
+
+            switch(sortValue) {
+                case 'name-asc':
+                    return nameA.localeCompare(nameB);
+                case 'name-desc':
+                    return nameB.localeCompare(nameA);
+                case 'price-asc':
+                    return priceA - priceB;
+                case 'price-desc':
+                    return priceB - priceA;
+                default:
+                    return 0;
+            }
+        });
+
+        products.forEach(function(product) {
+            grid.appendChild(product);
+        });
+    }
 </script>
 </body>
 </html>

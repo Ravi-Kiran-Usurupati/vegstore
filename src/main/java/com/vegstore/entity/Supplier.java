@@ -6,7 +6,8 @@ import lombok.*;
 
 @Entity
 @Table(name = "suppliers")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -17,18 +18,21 @@ public class Supplier {
     private Long id;
 
     @NotBlank(message = "Supplier name is required")
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String name;
 
     @NotBlank(message = "Contact person is required")
+    @Column(nullable = false, length = 100)
     private String contactPerson;
 
     @NotBlank(message = "Phone number is required")
     @Pattern(regexp = "^[0-9]{10}$", message = "Phone must be 10 digits")
+    @Column(nullable = false, length = 10)
     private String phone;
 
     @NotBlank(message = "Email is required")
     @Email(message = "Invalid email format")
+    @Column(nullable = false, length = 100)
     private String email;
 
     @Column(columnDefinition = "TEXT")

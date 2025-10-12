@@ -106,25 +106,36 @@ public class AdminController {
 
     @GetMapping("/suppliers")
     public String suppliers(Model model) {
-        model.addAttribute("suppliers", supplierService.getAllSuppliers());
-        model.addAttribute("supplier", new Supplier());
-        return "admin/suppliers";
+        try {
+            model.addAttribute("suppliers", supplierService.getAllSuppliers());
+            model.addAttribute("supplier", new Supplier());
+            return "admin/suppliers";
+        } catch (Exception e) {
+            log.error("Error loading suppliers: {}", e.getMessage());
+            model.addAttribute("error", "Error loading suppliers: " + e.getMessage());
+            return "admin/suppliers";
+        }
     }
 
     @PostMapping("/suppliers/add")
-    public String addSupplier(@Valid @ModelAttribute Supplier supplier,
+    public String addSupplier(@ModelAttribute Supplier supplier,
                               BindingResult result,
                               RedirectAttributes redirectAttributes) {
+
+        log.info("Attempting to add supplier: {}", supplier.getName());
+
         if (result.hasErrors()) {
+            log.error("Validation errors: {}", result.getAllErrors());
             redirectAttributes.addFlashAttribute("error", "Validation failed");
             return "redirect:/admin/suppliers";
         }
 
         try {
-            supplierService.createSupplier(supplier);
-            redirectAttributes.addFlashAttribute("success", "Supplier added successfully");
+            Supplier savedSupplier = supplierService.createSupplier(supplier);
+            log.info("Supplier created successfully with ID: {}", savedSupplier.getId());
+            redirectAttributes.addFlashAttribute("success", "Supplier added successfully!");
         } catch (Exception e) {
-            log.error("Error adding supplier: {}", e.getMessage());
+            log.error("Error adding supplier: {}", e.getMessage(), e);
             redirectAttributes.addFlashAttribute("error", "Error adding supplier: " + e.getMessage());
         }
 
@@ -133,19 +144,23 @@ public class AdminController {
 
     @PostMapping("/suppliers/update/{id}")
     public String updateSupplier(@PathVariable Long id,
-                                 @Valid @ModelAttribute Supplier supplier,
+                                 @ModelAttribute Supplier supplier,
                                  BindingResult result,
                                  RedirectAttributes redirectAttributes) {
+
+        log.info("Attempting to update supplier ID: {}", id);
+
         if (result.hasErrors()) {
+            log.error("Validation errors: {}", result.getAllErrors());
             redirectAttributes.addFlashAttribute("error", "Validation failed");
             return "redirect:/admin/suppliers";
         }
 
         try {
             supplierService.updateSupplier(id, supplier);
-            redirectAttributes.addFlashAttribute("success", "Supplier updated successfully");
+            redirectAttributes.addFlashAttribute("success", "Supplier updated successfully!");
         } catch (Exception e) {
-            log.error("Error updating supplier: {}", e.getMessage());
+            log.error("Error updating supplier: {}", e.getMessage(), e);
             redirectAttributes.addFlashAttribute("error", "Error updating supplier: " + e.getMessage());
         }
 
@@ -154,16 +169,19 @@ public class AdminController {
 
     @PostMapping("/suppliers/delete/{id}")
     public String deleteSupplier(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        log.info("Attempting to delete supplier ID: {}", id);
+
         try {
             supplierService.deleteSupplier(id);
-            redirectAttributes.addFlashAttribute("success", "Supplier deleted successfully");
+            redirectAttributes.addFlashAttribute("success", "Supplier deleted successfully!");
         } catch (Exception e) {
-            log.error("Error deleting supplier: {}", e.getMessage());
-            redirectAttributes.addFlashAttribute("error", "Cannot delete supplier: " + e.getMessage());
+            log.error("Error deleting supplier: {}", e.getMessage(), e);
+            redirectAttributes.addFlashAttribute("error", "Cannot delete supplier. It may be associated with products.");
         }
 
         return "redirect:/admin/suppliers";
     }
+
 
     // ========== PURCHASES ==========
 

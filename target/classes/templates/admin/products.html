@@ -148,14 +148,15 @@
                                             </span>
                                 </td>
                                 <td>
-                                    <button class="btn btn-sm btn-outline-primary"
-                                            th:onclick="'editProduct(' + ${product.id} + ')'"
+                                    <button class="btn btn-sm btn-outline-primary edit-product-btn"
+                                            th:data-id="${product.id}"
                                             data-bs-toggle="modal"
                                             data-bs-target="#editProductModal">
                                         <i class="bi bi-pencil"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-outline-danger"
-                                            th:onclick="'deleteProduct(' + ${product.id} + ', \'' + ${product.name} + '\')'">
+                                    <button class="btn btn-sm btn-outline-danger delete-product-btn"
+                                            th:data-id="${product.id}"
+                                            th:data-name="${product.name}">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </td>
@@ -177,7 +178,7 @@
                 <h5 class="modal-title text-white">
                     <i class="bi bi-plus-circle me-2"></i> Add New Product
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form th:action="@{/admin/products/add}" method="post">
                 <div class="modal-body">
@@ -253,10 +254,13 @@
                 <h5 class="modal-title text-white">
                     <i class="bi bi-pencil me-2"></i> Edit Product
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <p class="text-muted">Select a product from the table to edit</p>
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-2"></i>
+                    Select a product from the table to edit
+                </div>
             </div>
         </div>
     </div>
@@ -270,7 +274,7 @@
                 <h5 class="modal-title">
                     <i class="bi bi-exclamation-triangle me-2"></i> Confirm Delete
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <p>Are you sure you want to delete <strong id="deleteProductName"></strong>?</p>
@@ -301,18 +305,38 @@
         });
     });
 
-    // Delete product function
-    function deleteProduct(id, name) {
-        document.getElementById('deleteProductName').textContent = name;
-        document.getElementById('deleteForm').action = '/admin/products/delete/' + id;
-        new bootstrap.Modal(document.getElementById('deleteModal')).show();
-    }
+    // Delete product - using event delegation
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('delete-product-btn') || e.target.closest('.delete-product-btn')) {
+            const btn = e.target.classList.contains('delete-product-btn') ? e.target : e.target.closest('.delete-product-btn');
 
-    // Edit product function (simplified)
-    function editProduct(id) {
-        // In a real application, you would fetch product data and populate the edit form
-        alert('Edit functionality for product ID: ' + id + '\nImplement AJAX call to fetch and populate data');
-    }
+            const id = btn.getAttribute('data-id');
+            const name = btn.getAttribute('data-name');
+
+            document.getElementById('deleteProductName').textContent = name;
+            document.getElementById('deleteForm').action = '/admin/products/delete/' + id;
+            new bootstrap.Modal(document.getElementById('deleteModal')).show();
+        }
+
+        // Edit product
+        if (e.target.classList.contains('edit-product-btn') || e.target.closest('.edit-product-btn')) {
+            const btn = e.target.classList.contains('edit-product-btn') ? e.target : e.target.closest('.edit-product-btn');
+            const id = btn.getAttribute('data-id');
+
+            alert('Edit functionality for product ID: ' + id + '\nFull edit implementation coming soon!');
+        }
+    });
+
+    // Auto-dismiss alerts
+    document.addEventListener('DOMContentLoaded', function() {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(function(alert) {
+            setTimeout(function() {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            }, 5000);
+        });
+    });
 </script>
 </body>
 </html>

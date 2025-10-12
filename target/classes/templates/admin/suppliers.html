@@ -111,15 +111,21 @@
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end shadow">
                                         <li>
-                                            <button class="dropdown-item"
-                                                    th:onclick="'editSupplier(' + ${supplier.id} + ', \'' + ${supplier.name} + '\', \'' + ${supplier.contactPerson} + '\', \'' + ${supplier.phone} + '\', \'' + ${supplier.email} + '\', \'' + ${supplier.address} + '\')'">
+                                            <button class="dropdown-item edit-supplier-btn"
+                                                    th:data-id="${supplier.id}"
+                                                    th:data-name="${supplier.name}"
+                                                    th:data-contact="${supplier.contactPerson}"
+                                                    th:data-phone="${supplier.phone}"
+                                                    th:data-email="${supplier.email}"
+                                                    th:data-address="${supplier.address}">
                                                 <i class="bi bi-pencil text-primary me-2"></i> Edit
                                             </button>
                                         </li>
                                         <li><hr class="dropdown-divider"></li>
                                         <li>
-                                            <button class="dropdown-item text-danger"
-                                                    th:onclick="'deleteSupplier(' + ${supplier.id} + ', \'' + ${supplier.name} + '\')'">
+                                            <button class="dropdown-item text-danger delete-supplier-btn"
+                                                    th:data-id="${supplier.id}"
+                                                    th:data-name="${supplier.name}">
                                                 <i class="bi bi-trash me-2"></i> Delete
                                             </button>
                                         </li>
@@ -160,14 +166,14 @@
 </div>
 
 <!-- Add Supplier Modal -->
-<div class="modal fade" id="addSupplierModal" tabindex="-1" aria-labelledby="addSupplierModalLabel" aria-hidden="true">
+<div class="modal fade" id="addSupplierModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg">
             <div class="modal-header border-0">
-                <h5 class="modal-title text-white" id="addSupplierModalLabel">
+                <h5 class="modal-title text-white">
                     <i class="bi bi-plus-circle me-2"></i> Add New Supplier
                 </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form th:action="@{/admin/suppliers/add}" method="post" id="addSupplierForm">
                 <div class="modal-body p-4">
@@ -251,14 +257,14 @@
 </div>
 
 <!-- Edit Supplier Modal -->
-<div class="modal fade" id="editSupplierModal" tabindex="-1" aria-labelledby="editSupplierModalLabel" aria-hidden="true">
+<div class="modal fade" id="editSupplierModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg">
             <div class="modal-header border-0">
-                <h5 class="modal-title text-white" id="editSupplierModalLabel">
+                <h5 class="modal-title text-white">
                     <i class="bi bi-pencil me-2"></i> Edit Supplier
                 </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form id="editSupplierForm" method="post">
                 <input type="hidden" id="editSupplierId" name="id">
@@ -337,14 +343,14 @@
 </div>
 
 <!-- Delete Confirmation Modal -->
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+<div class="modal fade" id="deleteModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg">
             <div class="modal-header bg-danger border-0">
-                <h5 class="modal-title text-white" id="deleteModalLabel">
+                <h5 class="modal-title text-white">
                     <i class="bi bi-exclamation-triangle-fill me-2"></i> Confirm Delete
                 </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body p-4">
                 <div class="text-center mb-3">
@@ -354,7 +360,7 @@
                 <h5 class="text-center text-danger" id="deleteSupplierName"></h5>
                 <div class="alert alert-warning mt-3">
                     <i class="bi bi-info-circle me-2"></i>
-                    <strong>Warning:</strong> This action cannot be undone. All associated data may be affected.
+                    <strong>Warning:</strong> This action cannot be undone.
                 </div>
             </div>
             <div class="modal-footer border-0 p-4 pt-0">
@@ -375,29 +381,45 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    // Delete supplier function
-    function deleteSupplier(id, name) {
-        document.getElementById('deleteSupplierName').textContent = name;
-        document.getElementById('deleteForm').action = '/admin/suppliers/delete/' + id;
-        new bootstrap.Modal(document.getElementById('deleteModal')).show();
-    }
+    // Edit Supplier - using event delegation
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('edit-supplier-btn') || e.target.closest('.edit-supplier-btn')) {
+            const btn = e.target.classList.contains('edit-supplier-btn') ? e.target : e.target.closest('.edit-supplier-btn');
 
-    // Edit supplier function
-    function editSupplier(id, name, contactPerson, phone, email, address) {
-        // Set form action
-        document.getElementById('editSupplierForm').action = '/admin/suppliers/update/' + id;
+            const id = btn.getAttribute('data-id');
+            const name = btn.getAttribute('data-name');
+            const contact = btn.getAttribute('data-contact');
+            const phone = btn.getAttribute('data-phone');
+            const email = btn.getAttribute('data-email');
+            const address = btn.getAttribute('data-address');
 
-        // Populate form fields
-        document.getElementById('editSupplierId').value = id;
-        document.getElementById('editSupplierName').value = name;
-        document.getElementById('editContactPerson').value = contactPerson;
-        document.getElementById('editPhone').value = phone;
-        document.getElementById('editEmail').value = email;
-        document.getElementById('editAddress').value = address || '';
+            // Set form action
+            document.getElementById('editSupplierForm').action = '/admin/suppliers/update/' + id;
 
-        // Show modal
-        new bootstrap.Modal(document.getElementById('editSupplierModal')).show();
-    }
+            // Populate form fields
+            document.getElementById('editSupplierId').value = id;
+            document.getElementById('editSupplierName').value = name;
+            document.getElementById('editContactPerson').value = contact;
+            document.getElementById('editPhone').value = phone;
+            document.getElementById('editEmail').value = email;
+            document.getElementById('editAddress').value = address || '';
+
+            // Show modal
+            new bootstrap.Modal(document.getElementById('editSupplierModal')).show();
+        }
+
+        // Delete Supplier
+        if (e.target.classList.contains('delete-supplier-btn') || e.target.closest('.delete-supplier-btn')) {
+            const btn = e.target.classList.contains('delete-supplier-btn') ? e.target : e.target.closest('.delete-supplier-btn');
+
+            const id = btn.getAttribute('data-id');
+            const name = btn.getAttribute('data-name');
+
+            document.getElementById('deleteSupplierName').textContent = name;
+            document.getElementById('deleteForm').action = '/admin/suppliers/delete/' + id;
+            new bootstrap.Modal(document.getElementById('deleteModal')).show();
+        }
+    });
 
     // Form validation
     document.getElementById('addSupplierForm').addEventListener('submit', function(e) {
