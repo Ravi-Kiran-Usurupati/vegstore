@@ -1,134 +1,357 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout}">
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout - GreenBasket</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+
+    <style>
+        .checkout-step {
+            border-left: 3px solid #10b981;
+            padding-left: 20px;
+            margin-bottom: 30px;
+        }
+        .order-summary-item {
+            border-bottom: 1px solid #e5e7eb;
+            padding: 15px 0;
+        }
+        .order-summary-item:last-child {
+            border-bottom: none;
+        }
+    </style>
 </head>
 <body>
-<div layout:fragment="content">
-    <h1 class="mb-4">Checkout</h1>
-
-    <div class="row">
-        <div class="col-md-8">
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h5>Order Summary</h5>
-                    <div id="checkout-items">
-                        <!-- Items will be populated by JavaScript -->
-                    </div>
-                </div>
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-gradient-primary sticky-top shadow-sm">
+    <div class="container-fluid px-4">
+        <a class="navbar-brand d-flex align-items-center" th:href="@{/}">
+            <div class="brand-icon me-2">
+                <i class="bi bi-basket2-fill fs-3"></i>
             </div>
+            <span class="brand-text fw-bold">GreenBasket</span>
+        </a>
 
-            <div class="card">
-                <div class="card-body">
-                    <h5>Delivery Information</h5>
-                    <p><strong>Customer:</strong> <span th:text="${currentUser.fullName}">Name</span></p>
-                    <p><strong>Username:</strong> <span th:text="${currentUser.username}">Username</span></p>
-                    <p class="text-muted">
-                        <i class="bi bi-info-circle"></i>
-                        Your order will be processed and assigned to a salesperson.
-                    </p>
-                </div>
-            </div>
-        </div>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5>Payment Summary</h5>
-                    <hr>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Subtotal:</span>
-                        <span>₹<span id="checkout-subtotal">0.00</span></span>
-                    </div>
-                    <hr>
-                    <div class="d-flex justify-content-between mb-3">
-                        <strong>Total:</strong>
-                        <strong class="text-success">₹<span id="checkout-total">0.00</span></strong>
-                    </div>
-
-                    <button class="btn btn-success w-100" onclick="placeOrder()">
-                        Place Order
-                    </button>
-                    <a th:href="@{/cart}" class="btn btn-secondary w-100 mt-2">
-                        Back to Cart
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center">
+                <li class="nav-item">
+                    <a class="nav-link px-3" th:href="@{/}">
+                        <i class="bi bi-house-door me-1"></i> Home
                     </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link px-3" th:href="@{/products}">
+                        <i class="bi bi-grid me-1"></i> Products
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link px-3" th:href="@{/cart}">
+                        <i class="bi bi-cart3 me-1"></i> Cart
+                        <span class="badge bg-danger ms-1" id="cart-badge" style="display: none;">0</span>
+                    </a>
+                </li>
+                <li class="nav-item dropdown ms-2">
+                    <a class="nav-link dropdown-toggle btn btn-outline-light rounded-pill px-3"
+                       href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-person-circle me-1"></i>
+                        <span th:text="${currentUser?.fullName}">User</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2">
+                        <li>
+                            <form th:action="@{/logout}" method="post">
+                                <button type="submit" class="dropdown-item text-danger">
+                                    <i class="bi bi-box-arrow-right me-2"></i> Logout
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Progress Steps -->
+<div class="bg-light py-3">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-4">
+                <div class="step-completed">
+                    <i class="bi bi-cart-check-fill fs-3 text-success"></i>
+                    <p class="mb-0 mt-2 small">Cart</p>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="step-active">
+                    <i class="bi bi-credit-card-fill fs-3 text-success"></i>
+                    <p class="mb-0 mt-2 small fw-bold">Checkout</p>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="step-pending">
+                    <i class="bi bi-check-circle fs-3 text-muted"></i>
+                    <p class="mb-0 mt-2 small text-muted">Confirmation</p>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<script th:inline="javascript">
-    document.addEventListener('DOMContentLoaded', displayCheckout);
+<!-- Checkout Section -->
+<section class="py-5">
+    <div class="container">
+        <!-- Empty Cart Warning -->
+        <div id="emptyCartWarning" class="text-center py-5" style="display: none;">
+            <i class="bi bi-cart-x display-1 text-muted"></i>
+            <h3 class="mt-3">Your cart is empty</h3>
+            <p class="text-muted mb-4">Add some products before proceeding to checkout</p>
+            <a th:href="@{/products}" class="btn btn-success rounded-pill px-4">
+                <i class="bi bi-shop me-2"></i> Browse Products
+            </a>
+        </div>
 
-    function displayCheckout() {
-        const cart = getCart();
-        if (Object.keys(cart).length === 0) {
-            window.location.href = '/cart';
+        <!-- Checkout Form -->
+        <div id="checkoutForm" class="row">
+            <div class="col-lg-8 mb-4">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0">
+                            <i class="bi bi-geo-alt-fill text-success me-2"></i> Delivery Information
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <form id="orderForm" th:action="@{/checkout/place-order}" method="post">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Full Name *</label>
+                                    <input type="text" name="customerName" class="form-control form-control-lg"
+                                           th:value="${currentUser?.fullName}" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Phone Number *</label>
+                                    <input type="tel" name="customerPhone" class="form-control form-control-lg"
+                                           pattern="[0-9]{10}" placeholder="10-digit number" required>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label fw-semibold">Delivery Address *</label>
+                                    <textarea name="deliveryAddress" class="form-control" rows="3"
+                                              placeholder="House no., Street, Area, City, State, PIN" required></textarea>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">City *</label>
+                                    <input type="text" name="city" class="form-control form-control-lg"
+                                           value="Vijayawada" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">PIN Code *</label>
+                                    <input type="text" name="pincode" class="form-control form-control-lg"
+                                           pattern="[0-9]{6}" placeholder="6-digit PIN" required>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label fw-semibold">Delivery Instructions (Optional)</label>
+                                    <textarea name="deliveryNotes" class="form-control" rows="2"
+                                              placeholder="Any specific delivery instructions..."></textarea>
+                                </div>
+                            </div>
+
+                            <hr class="my-4">
+
+                            <h5 class="mb-3">
+                                <i class="bi bi-credit-card text-success me-2"></i> Payment Method
+                            </h5>
+                            <div class="form-check mb-3 p-3 border rounded">
+                                <input class="form-check-input" type="radio" name="paymentMethod"
+                                       id="cod" value="COD" checked>
+                                <label class="form-check-label ms-2" for="cod">
+                                    <strong>Cash on Delivery (COD)</strong>
+                                    <p class="text-muted small mb-0">Pay when you receive your order</p>
+                                </label>
+                            </div>
+                            <div class="form-check p-3 border rounded">
+                                <input class="form-check-input" type="radio" name="paymentMethod"
+                                       id="online" value="ONLINE">
+                                <label class="form-check-label ms-2" for="online">
+                                    <strong>Online Payment</strong>
+                                    <p class="text-muted small mb-0">UPI, Cards, Net Banking</p>
+                                </label>
+                            </div>
+
+                            <!-- Hidden field for cart data -->
+                            <input type="hidden" name="cartData" id="cartDataInput">
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm sticky-top" style="top: 100px;">
+                    <div class="card-header bg-success text-white py-3">
+                        <h5 class="mb-0">
+                            <i class="bi bi-receipt-cutoff me-2"></i> Order Summary
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Order Items -->
+                        <div id="orderItems" class="mb-3">
+                            <!-- Items will be loaded here -->
+                        </div>
+
+                        <hr>
+
+                        <!-- Price Breakdown -->
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Subtotal (<span id="itemCountSummary">0</span> items)</span>
+                            <strong id="subtotalAmount">₹0.00</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Delivery Fee</span>
+                            <strong id="deliveryFeeAmount">₹50.00</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3 text-success" id="discountRow" style="display: none;">
+                            <span>Discount</span>
+                            <strong id="discountAmount">- ₹0.00</strong>
+                        </div>
+
+                        <div class="alert alert-info small mb-3">
+                            <i class="bi bi-gift me-2"></i>
+                            Free delivery on orders above ₹500
+                        </div>
+
+                        <hr>
+
+                        <div class="d-flex justify-content-between mb-4">
+                            <h5 class="mb-0">Total Amount</h5>
+                            <h5 class="mb-0 text-success" id="totalAmount">₹0.00</h5>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="button" class="btn btn-success btn-lg rounded-pill"
+                                    id="placeOrderBtn">
+                                <i class="bi bi-check-circle me-2"></i> Place Order
+                            </button>
+                            <a th:href="@{/cart}" class="btn btn-outline-secondary rounded-pill">
+                                <i class="bi bi-arrow-left me-2"></i> Back to Cart
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-dark text-white py-4 mt-5">
+    <div class="container text-center">
+        <small>&copy; 2025 GreenBasket. All rights reserved.</small>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/cart.js}"></script>
+
+<script>
+    let orderSubtotal = 0;
+    let orderTotal = 0;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Checkout page loaded');
+        loadCheckoutData();
+        updateCartBadge();
+
+        // Place order button
+        document.getElementById('placeOrderBtn').addEventListener('click', function() {
+            const cart = getCartData();
+            if (cart.length === 0) {
+                alert('Your cart is empty!');
+                return;
+            }
+
+            // Validate form
+            const form = document.getElementById('orderForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            // Set cart data in hidden field
+            document.getElementById('cartDataInput').value = JSON.stringify(cart);
+
+            // Submit form
+            form.submit();
+        });
+    });
+
+    function loadCheckoutData() {
+        const cart = getCartData();
+        console.log('Loading checkout. Cart items:', cart.length);
+
+        if (cart.length === 0) {
+            document.getElementById('emptyCartWarning').style.display = 'block';
+            document.getElementById('checkoutForm').style.display = 'none';
             return;
         }
 
-        let itemsHtml = '<ul class="list-group">';
-        let total = 0;
+        document.getElementById('emptyCartWarning').style.display = 'none';
+        document.getElementById('checkoutForm').style.display = 'flex';
 
-        for (const [id, item] of Object.entries(cart)) {
-            const subtotal = item.price * item.quantity;
-            total += subtotal;
-
-            itemsHtml += `
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <div>
-                        <strong>${item.name}</strong><br>
-                        <small class="text-muted">${item.quantity} kg × ₹${item.price.toFixed(2)}/kg</small>
-                    </div>
-                    <span class="badge bg-success">₹${subtotal.toFixed(2)}</span>
-                </li>
-            `;
-        }
-        itemsHtml += '</ul>';
-
-        document.getElementById('checkout-items').innerHTML = itemsHtml;
-        document.getElementById('checkout-subtotal').textContent = total.toFixed(2);
-        document.getElementById('checkout-total').textContent = total.toFixed(2);
+        renderOrderItems(cart);
+        calculateOrderSummary(cart);
     }
 
-    async function placeOrder() {
-        const cart = getCart();
-        if (Object.keys(cart).length === 0) {
-            alert('Your cart is empty');
-            return;
-        }
+    function renderOrderItems(cart) {
+        const container = document.getElementById('orderItems');
+        let html = '';
 
-        // Convert cart to the format expected by the backend
-        const cartItems = {};
-        for (const [id, item] of Object.entries(cart)) {
-            cartItems[id] = item.quantity;
-        }
+        cart.forEach(function(item) {
+            const itemTotal = item.price * item.quantity;
+            html += `
+                <div class="order-summary-item">
+                    <div class="d-flex justify-content-between align-items-start mb-1">
+                        <div class="flex-grow-1">
+                            <h6 class="mb-1">${item.name}</h6>
+                            <small class="text-muted">${item.quantity} kg × ₹${item.price.toFixed(2)}</small>
+                        </div>
+                        <strong class="text-success ms-2">₹${itemTotal.toFixed(2)}</strong>
+                    </div>
+                </div>
+            `;
+        });
 
-        try {
-            const response = await fetch('/checkout', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(cartItems)
-            });
+        container.innerHTML = html;
+    }
 
-            const result = await response.json();
+    function calculateOrderSummary(cart) {
+        // Calculate subtotal
+        orderSubtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
-            if (result.success) {
-                clearCart();
-                alert('Order placed successfully! Order ID: ' + result.orderId);
-                window.location.href = '/my-orders';
-            } else {
-                alert('Error: ' + result.message);
-            }
-        } catch (error) {
-            alert('An error occurred while placing the order');
-            console.error(error);
-        }
+        // Calculate delivery fee (free if subtotal >= 500)
+        const deliveryFee = orderSubtotal >= 500 ? 0 : 50;
+
+        // Calculate total
+        orderTotal = orderSubtotal + deliveryFee;
+
+        // Update UI
+        document.getElementById('itemCountSummary').textContent = cart.length;
+        document.getElementById('subtotalAmount').textContent = '₹' + orderSubtotal.toFixed(2);
+        document.getElementById('deliveryFeeAmount').textContent = deliveryFee === 0 ? 'FREE' : '₹' + deliveryFee.toFixed(2);
+        document.getElementById('totalAmount').textContent = '₹' + orderTotal.toFixed(2);
+
+        console.log('Order Summary:', {
+            subtotal: orderSubtotal,
+            deliveryFee: deliveryFee,
+            total: orderTotal
+        });
     }
 </script>
 </body>

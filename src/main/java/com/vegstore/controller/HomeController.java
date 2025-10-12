@@ -43,10 +43,7 @@ public class HomeController {
         return "product-detail";
     }
 
-    @GetMapping("/cart")
-    public String cart() {
-        return "cart";
-    }
+
 
     @GetMapping("/access-denied")
     public String accessDenied() {
