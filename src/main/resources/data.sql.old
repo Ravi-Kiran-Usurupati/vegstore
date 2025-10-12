@@ -1,0 +1,124 @@
+-- =====================================================
+-- GreenBasket Data Initialization
+-- =====================================================
+-- Password for all users: password123
+-- BCrypt Hash: $2a$10$N9qo8uLOickgx2ZMRZoMye6J1JEy0xKfYW3xJz6FBz5mq8hS.8Mlu
+-- =====================================================
+
+-- Clear existing data (optional - use with caution)
+SET FOREIGN_KEY_CHECKS = 0;
+TRUNCATE TABLE order_items;
+TRUNCATE TABLE orders;
+TRUNCATE TABLE purchases;
+TRUNCATE TABLE products;
+TRUNCATE TABLE suppliers;
+TRUNCATE TABLE users;
+SET FOREIGN_KEY_CHECKS = 1;
+
+-- =====================================================
+-- INSERT USERS
+-- =====================================================
+
+-- Admin User
+INSERT INTO users (id, username, password, full_name, role, is_wholesale) VALUES
+(1, 'admin', '$2a$10$N9qo8uLOickgx2ZMRZoMye6J1JEy0xKfYW3xJz6FBz5mq8hS.8Mlu', 'Admin User', 'ADMIN', false);
+
+-- Salesperson Users
+INSERT INTO users (id, username, password, full_name, role, is_wholesale) VALUES
+(2, 'sales1', '$2a$10$N9qo8uLOickgx2ZMRZoMye6J1JEy0xKfYW3xJz6FBz5mq8hS.8Mlu', 'John Sales', 'SALESPERSON', false),
+(3, 'sales2', '$2a$10$N9qo8uLOickgx2ZMRZoMye6J1JEy0xKfYW3xJz6FBz5mq8hS.8Mlu', 'Mary Johnson', 'SALESPERSON', false);
+
+-- Retail Customers
+INSERT INTO users (id, username, password, full_name, role, is_wholesale) VALUES
+(4, 'customer1', '$2a$10$N9qo8uLOickgx2ZMRZoMye6J1JEy0xKfYW3xJz6FBz5mq8hS.8Mlu', 'Alice Retail', 'CUSTOMER', false),
+(5, 'customer2', '$2a$10$N9qo8uLOickgx2ZMRZoMye6J1JEy0xKfYW3xJz6FBz5mq8hS.8Mlu', 'Bob Smith', 'CUSTOMER', false);
+
+-- Wholesale Customers
+INSERT INTO users (id, username, password, full_name, role, is_wholesale) VALUES
+(6, 'wholesale1', '$2a$10$N9qo8uLOickgx2ZMRZoMye6J1JEy0xKfYW3xJz6FBz5mq8hS.8Mlu', 'Charlie Wholesale', 'CUSTOMER', true),
+(7, 'wholesale2', '$2a$10$N9qo8uLOickgx2ZMRZoMye6J1JEy0xKfYW3xJz6FBz5mq8hS.8Mlu', 'Diana Bulk Buyer', 'CUSTOMER', true);
+
+-- =====================================================
+-- INSERT SUPPLIERS
+-- =====================================================
+
+INSERT INTO suppliers (id, name, contact_person, phone, email, address) VALUES
+(1, 'Fresh Farms Ltd', 'Rajesh Kumar', '9876543210', 'rajesh@freshfarms.com', '123 Farm Road, Punjab, India'),
+(2, 'Green Valley Suppliers', 'Priya Sharma', '9876543211', 'priya@greenvalley.com', '456 Valley Street, Karnataka, India'),
+(3, 'Organic Harvest Co', 'Amit Patel', '9876543212', 'amit@organicharvest.com', '789 Harvest Lane, Gujarat, India'),
+(4, 'Nature Fresh Produce', 'Sunita Verma', '9876543213', 'sunita@naturefresh.com', '321 Green Street, Maharashtra, India'),
+(5, 'Farm Direct Veggies', 'Vikram Singh', '9876543214', 'vikram@farmdirect.com', '654 Farm Avenue, Haryana, India');
+
+-- =====================================================
+-- INSERT PRODUCTS
+-- =====================================================
+
+-- Leafy Vegetables
+INSERT INTO products (id, name, description, retail_price_per_kg, wholesale_price_per_kg, min_wholesale_quantity_kg, stock_kg, category, image_url, supplier_id) VALUES
+(1, 'Spinach', 'Fresh organic spinach, rich in iron and vitamins', 40.00, 35.00, 5.0, 120.0, 'Leafy', 'https://images.unsplash.com/photo-1576045057995-568f588f82fb?w=400', 3),
+(2, 'Cabbage', 'Green cabbage, perfect for salads and cooking', 30.00, 25.00, 10.0, 150.0, 'Leafy', 'https://images.unsplash.com/photo-1594282486552-05b4d80fbb9f?w=400', 1),
+(3, 'Lettuce', 'Crispy fresh lettuce for healthy salads', 45.00, 40.00, 5.0, 80.0, 'Leafy', 'https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?w=400', 3),
+(4, 'Coriander', 'Fresh coriander leaves for garnishing', 50.00, 45.00, 3.0, 60.0, 'Leafy', 'https://images.unsplash.com/photo-1598030276744-17ac0c3bea14?w=400', 2);
+
+-- Root Vegetables
+INSERT INTO products (id, name, description, retail_price_per_kg, wholesale_price_per_kg, min_wholesale_quantity_kg, stock_kg, category, image_url, supplier_id) VALUES
+(5, 'Potatoes', 'Farm fresh potatoes, versatile for all dishes', 30.00, 25.00, 10.0, 200.0, 'Root', 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=400', 1),
+(6, 'Onions', 'Red onions, essential for every kitchen', 35.00, 30.00, 10.0, 180.0, 'Root', 'https://images.unsplash.com/photo-1508747703725-719777637510?w=400', 1),
+(7, 'Carrots', 'Sweet and crunchy orange carrots', 45.00, 40.00, 8.0, 140.0, 'Root', 'https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=400', 2),
+(8, 'Beetroot', 'Fresh beetroot, great for salads and juice', 50.00, 45.00, 5.0, 90.0, 'Root', 'https://images.unsplash.com/photo-1590779033100-9f60a05a013d?w=400', 2),
+(9, 'Radish', 'White radish, crispy and refreshing', 35.00, 30.00, 5.0, 75.0, 'Root', 'https://images.unsplash.com/photo-1615485736831-2e4c5f5e7d12?w=400', 4);
+
+-- Fruiting Vegetables
+INSERT INTO products (id, name, description, retail_price_per_kg, wholesale_price_per_kg, min_wholesale_quantity_kg, stock_kg, category, image_url, supplier_id) VALUES
+(10, 'Tomatoes', 'Juicy red tomatoes, fresh from farm', 40.00, 35.00, 5.0, 160.0, 'Fruiting', 'https://images.unsplash.com/photo-1546094096-0df4bcaaa337?w=400', 1),
+(11, 'Capsicum (Bell Pepper)', 'Colorful capsicum, rich in vitamins', 60.00, 55.00, 5.0, 100.0, 'Fruiting', 'https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?w=400', 2),
+(12, 'Eggplant (Brinjal)', 'Purple eggplant, great for curries', 45.00, 40.00, 8.0, 110.0, 'Fruiting', 'https://images.unsplash.com/photo-1659261200833-ec8761558af7?w=400', 3),
+(13, 'Cucumber', 'Fresh green cucumber, perfect for salads', 35.00, 30.00, 10.0, 130.0, 'Fruiting', 'https://images.unsplash.com/photo-1604977042946-1eecc30f269e?w=400', 2),
+(14, 'Green Chilli', 'Spicy green chillies for authentic flavor', 80.00, 75.00, 3.0, 50.0, 'Fruiting', 'https://images.unsplash.com/photo-1583663848850-46af132dc08e?w=400', 4);
+
+-- Beans and Legumes
+INSERT INTO products (id, name, description, retail_price_per_kg, wholesale_price_per_kg, min_wholesale_quantity_kg, stock_kg, category, image_url, supplier_id) VALUES
+(15, 'Green Beans', 'Fresh green beans, tender and crisp', 55.00, 50.00, 5.0, 95.0, 'Beans', 'https://images.unsplash.com/photo-1599620811531-6e4d3e4d77e8?w=400', 2),
+(16, 'Peas', 'Sweet green peas, perfect for any dish', 70.00, 65.00, 5.0, 80.0, 'Beans', 'https://images.unsplash.com/photo-1587411768140-7cf3c0e85146?w=400', 3);
+
+-- Gourds
+INSERT INTO products (id, name, description, retail_price_per_kg, wholesale_price_per_kg, min_wholesale_quantity_kg, stock_kg, category, image_url, supplier_id) VALUES
+(17, 'Bottle Gourd', 'Fresh bottle gourd, light and healthy', 38.00, 33.00, 8.0, 105.0, 'Gourd', 'https://images.unsplash.com/photo-1631256878844-c0c487fb1d2e?w=400', 4),
+(18, 'Bitter Gourd', 'Bitter gourd, excellent for health', 45.00, 40.00, 5.0, 70.0, 'Gourd', 'https://images.unsplash.com/photo-1631256877332-d8ceb6c20169?w=400', 4),
+(19, 'Ridge Gourd', 'Fresh ridge gourd for delicious curries', 42.00, 37.00, 6.0, 85.0, 'Gourd', 'https://images.unsplash.com/photo-1631256877454-b6396dc0caa0?w=400', 5);
+
+-- Other Vegetables
+INSERT INTO products (id, name, description, retail_price_per_kg, wholesale_price_per_kg, min_wholesale_quantity_kg, stock_kg, category, image_url, supplier_id) VALUES
+(20, 'Cauliflower', 'White cauliflower, perfect for various dishes', 48.00, 43.00, 8.0, 120.0, 'Other', 'https://images.unsplash.com/photo-1568584711271-f9f572df3c3d?w=400', 1),
+(21, 'Broccoli', 'Fresh green broccoli, nutrient-rich', 90.00, 85.00, 5.0, 65.0, 'Other', 'https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?w=400', 3),
+(22, 'Pumpkin', 'Orange pumpkin, sweet and nutritious', 35.00, 30.00, 10.0, 140.0, 'Other', 'https://images.unsplash.com/photo-1569976710208-b52636b52c09?w=400', 5),
+(23, 'Garlic', 'Fresh garlic bulbs, essential ingredient', 120.00, 110.00, 3.0, 55.0, 'Other', 'https://images.unsplash.com/photo-1583319871826-47ca1d7d1de4?w=400', 2),
+(24, 'Ginger', 'Fresh ginger root, aromatic and spicy', 100.00, 95.00, 3.0, 60.0, 'Other', 'https://images.unsplash.com/photo-1617882252722-5816c50c8bce?w=400', 2),
+(25, 'Sweet Corn', 'Fresh sweet corn, sweet and crunchy', 50.00, 45.00, 8.0, 100.0, 'Other', 'https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=400', 5);
+
+-- =====================================================
+-- INSERT PURCHASES (Sample purchase history)
+-- =====================================================
+
+INSERT INTO purchases (id, supplier_id, product_id, quantity_kg, cost_per_kg, total_amount, purchase_date) VALUES
+(1, 1, 5, 50.0, 20.00, 1000.00, '2025-10-01 10:00:00'),
+(2, 1, 6, 50.0, 22.00, 1100.00, '2025-10-01 10:15:00'),
+(3, 1, 10, 40.0, 28.00, 1120.00, '2025-10-01 10:30:00'),
+(4, 2, 7, 40.0, 32.00, 1280.00, '2025-10-02 09:00:00'),
+(5, 2, 11, 30.0, 45.00, 1350.00, '2025-10-02 09:30:00'),
+(6, 3, 1, 30.0, 30.00, 900.00, '2025-10-03 11:00:00'),
+(7, 3, 12, 35.0, 32.00, 1120.00, '2025-10-03 11:30:00'),
+(8, 4, 14, 15.0, 65.00, 975.00, '2025-10-04 10:00:00'),
+(9, 5, 22, 45.0, 23.00, 1035.00, '2025-10-05 08:00:00'),
+(10, 2, 23, 20.0, 95.00, 1900.00, '2025-10-06 09:00:00');
+
+-- =====================================================
+-- RESET AUTO_INCREMENT
+-- =====================================================
+
+ALTER TABLE users AUTO_INCREMENT = 8;
+ALTER TABLE suppliers AUTO_INCREMENT = 6;
+ALTER TABLE products AUTO_INCREMENT = 26;
+ALTER TABLE purchases AUTO_INCREMENT = 11;
+ALTER TABLE orders AUTO_INCREMENT = 1;
+ALTER TABLE order_items AUTO_INCREMENT = 1;

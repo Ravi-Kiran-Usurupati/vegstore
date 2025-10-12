@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Suppliers - GreenBasket Admin</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-gradient-primary sticky-top shadow-sm">
+    <div class="container-fluid px-4">
+        <a class="navbar-brand" th:href="@{/admin/dashboard}">
+            <i class="bi bi-basket2-fill me-2"></i> GreenBasket Admin
+        </a>
+        <div class="ms-auto">
+                <span class="text-white me-3">
+                    <i class="bi bi-person-circle me-1"></i>
+                    <span th:text="${currentUser?.fullName}">Admin</span>
+                </span>
+            <form th:action="@{/logout}" method="post" class="d-inline">
+                <button type="submit" class="btn btn-outline-light btn-sm">
+                    <i class="bi bi-box-arrow-right me-1"></i> Logout
+                </button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid my-4">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="list-group list-group-flush">
+                    <a th:href="@{/admin/dashboard}" class="list-group-item list-group-item-action">
+                        <i class="bi bi-speedometer2 me-2"></i> Dashboard
+                    </a>
+                    <a th:href="@{/admin/products}" class="list-group-item list-group-item-action">
+                        <i class="bi bi-box-seam me-2"></i> Products
+                    </a>
+                    <a th:href="@{/admin/suppliers}" class="list-group-item list-group-item-action active">
+                        <i class="bi bi-truck me-2"></i> Suppliers
+                    </a>
+                    <a th:href="@{/admin/purchases}" class="list-group-item list-group-item-action">
+                        <i class="bi bi-cart-check me-2"></i> Purchases
+                    </a>
+                    <a th:href="@{/}" class="list-group-item list-group-item-action">
+                        <i class="bi bi-globe me-2"></i> View Store
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9 col-lg-10">
+            <!-- Page Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="mb-2">
+                        <i class="bi bi-truck text-success me-2"></i> Manage Suppliers
+                    </h1>
+                    <p class="text-muted mb-0">Add and manage supplier information</p>
+                </div>
+                <button class="btn btn-success rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#addSupplierModal">
+                    <i class="bi bi-plus-circle me-2"></i> Add New Supplier
+                </button>
+            </div>
+
+            <!-- Alert Messages -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show slide-in-right" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i>
+                <strong>Success!</strong> <span th:text="${success}">Success message</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show slide-in-right" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <strong>Error!</strong> <span th:text="${error}">Error message</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Empty State -->
+            <div th:if="${suppliers.isEmpty()}" class="text-center py-5">
+                <div class="empty-state">
+                    <i class="bi bi-truck display-1 text-muted"></i>
+                    <h3 class="mt-3">No Suppliers Found</h3>
+                    <p class="text-muted mb-4">Start by adding your first supplier to manage inventory</p>
+                    <button class="btn btn-success rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#addSupplierModal">
+                        <i class="bi bi-plus-circle me-2"></i> Add First Supplier
+                    </button>
+                </div>
+            </div>
+
+            <!-- Suppliers Grid -->
+            <div th:if="${!suppliers.isEmpty()}" class="row g-4">
+                <div class="col-md-6 col-lg-4" th:each="supplier : ${suppliers}">
+                    <div class="card border-0 shadow-sm h-100 hover-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div class="bg-success bg-opacity-10 rounded-circle p-3">
+                                    <i class="bi bi-truck fs-3 text-success"></i>
+                                </div>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-light rounded-circle" data-bs-toggle="dropdown">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow">
+                                        <li>
+                                            <button class="dropdown-item"
+                                                    th:onclick="'editSupplier(' + ${supplier.id} + ', \'' + ${supplier.name} + '\', \'' + ${supplier.contactPerson} + '\', \'' + ${supplier.phone} + '\', \'' + ${supplier.email} + '\', \'' + ${supplier.address} + '\')'">
+                                                <i class="bi bi-pencil text-primary me-2"></i> Edit
+                                            </button>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <button class="dropdown-item text-danger"
+                                                    th:onclick="'deleteSupplier(' + ${supplier.id} + ', \'' + ${supplier.name} + '\')'">
+                                                <i class="bi bi-trash me-2"></i> Delete
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <h5 class="card-title fw-bold mb-3" th:text="${supplier.name}">Supplier Name</h5>
+
+                            <div class="supplier-info">
+                                <div class="info-item mb-2">
+                                    <i class="bi bi-person-circle text-success me-2"></i>
+                                    <span class="text-muted small">Contact:</span>
+                                    <span class="ms-1" th:text="${supplier.contactPerson}">Contact Person</span>
+                                </div>
+                                <div class="info-item mb-2">
+                                    <i class="bi bi-telephone-fill text-success me-2"></i>
+                                    <span class="text-muted small">Phone:</span>
+                                    <a th:href="'tel:' + ${supplier.phone}" class="ms-1 text-decoration-none" th:text="${supplier.phone}">Phone</a>
+                                </div>
+                                <div class="info-item mb-2">
+                                    <i class="bi bi-envelope-fill text-success me-2"></i>
+                                    <span class="text-muted small">Email:</span>
+                                    <a th:href="'mailto:' + ${supplier.email}" class="ms-1 text-decoration-none small" th:text="${supplier.email}">Email</a>
+                                </div>
+                                <div class="info-item mb-0" th:if="${supplier.address != null and !supplier.address.isEmpty()}">
+                                    <i class="bi bi-geo-alt-fill text-success me-2"></i>
+                                    <span class="text-muted small">Address:</span>
+                                    <p class="ms-4 mb-0 small text-muted" th:text="${supplier.address}">Address</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Supplier Modal -->
+<div class="modal fade" id="addSupplierModal" tabindex="-1" aria-labelledby="addSupplierModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header border-0">
+                <h5 class="modal-title text-white" id="addSupplierModalLabel">
+                    <i class="bi bi-plus-circle me-2"></i> Add New Supplier
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form th:action="@{/admin/suppliers/add}" method="post" id="addSupplierForm">
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label for="supplierName" class="form-label fw-semibold">
+                            <i class="bi bi-building me-1"></i> Supplier Name *
+                        </label>
+                        <input type="text"
+                               class="form-control form-control-lg"
+                               id="supplierName"
+                               name="name"
+                               placeholder="Enter supplier/company name"
+                               required
+                               minlength="2"
+                               maxlength="100">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="contactPerson" class="form-label fw-semibold">
+                            <i class="bi bi-person me-1"></i> Contact Person *
+                        </label>
+                        <input type="text"
+                               class="form-control form-control-lg"
+                               id="contactPerson"
+                               name="contactPerson"
+                               placeholder="Enter contact person name"
+                               required
+                               minlength="2"
+                               maxlength="100">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="phone" class="form-label fw-semibold">
+                            <i class="bi bi-telephone me-1"></i> Phone Number *
+                        </label>
+                        <input type="tel"
+                               class="form-control form-control-lg"
+                               id="phone"
+                               name="phone"
+                               placeholder="Enter 10-digit mobile number"
+                               pattern="[0-9]{10}"
+                               required
+                               maxlength="10">
+                        <div class="form-text">Enter 10-digit number without spaces or dashes</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label fw-semibold">
+                            <i class="bi bi-envelope me-1"></i> Email Address *
+                        </label>
+                        <input type="email"
+                               class="form-control form-control-lg"
+                               id="email"
+                               name="email"
+                               placeholder="supplier@example.com"
+                               required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="address" class="form-label fw-semibold">
+                            <i class="bi bi-geo-alt me-1"></i> Address (Optional)
+                        </label>
+                        <textarea class="form-control"
+                                  id="address"
+                                  name="address"
+                                  rows="3"
+                                  placeholder="Enter complete address"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 p-4 pt-0">
+                    <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-2"></i> Cancel
+                    </button>
+                    <button type="submit" class="btn btn-success rounded-pill px-4">
+                        <i class="bi bi-check-circle me-2"></i> Add Supplier
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Supplier Modal -->
+<div class="modal fade" id="editSupplierModal" tabindex="-1" aria-labelledby="editSupplierModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header border-0">
+                <h5 class="modal-title text-white" id="editSupplierModalLabel">
+                    <i class="bi bi-pencil me-2"></i> Edit Supplier
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editSupplierForm" method="post">
+                <input type="hidden" id="editSupplierId" name="id">
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label for="editSupplierName" class="form-label fw-semibold">
+                            <i class="bi bi-building me-1"></i> Supplier Name *
+                        </label>
+                        <input type="text"
+                               class="form-control form-control-lg"
+                               id="editSupplierName"
+                               name="name"
+                               required
+                               minlength="2"
+                               maxlength="100">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editContactPerson" class="form-label fw-semibold">
+                            <i class="bi bi-person me-1"></i> Contact Person *
+                        </label>
+                        <input type="text"
+                               class="form-control form-control-lg"
+                               id="editContactPerson"
+                               name="contactPerson"
+                               required
+                               minlength="2"
+                               maxlength="100">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editPhone" class="form-label fw-semibold">
+                            <i class="bi bi-telephone me-1"></i> Phone Number *
+                        </label>
+                        <input type="tel"
+                               class="form-control form-control-lg"
+                               id="editPhone"
+                               name="phone"
+                               pattern="[0-9]{10}"
+                               required
+                               maxlength="10">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editEmail" class="form-label fw-semibold">
+                            <i class="bi bi-envelope me-1"></i> Email Address *
+                        </label>
+                        <input type="email"
+                               class="form-control form-control-lg"
+                               id="editEmail"
+                               name="email"
+                               required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editAddress" class="form-label fw-semibold">
+                            <i class="bi bi-geo-alt me-1"></i> Address
+                        </label>
+                        <textarea class="form-control"
+                                  id="editAddress"
+                                  name="address"
+                                  rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 p-4 pt-0">
+                    <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-2"></i> Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4">
+                        <i class="bi bi-check-circle me-2"></i> Update Supplier
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-danger border-0">
+                <h5 class="modal-title text-white" id="deleteModalLabel">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> Confirm Delete
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="text-center mb-3">
+                    <i class="bi bi-exclamation-circle text-danger" style="font-size: 4rem;"></i>
+                </div>
+                <p class="text-center mb-3">Are you sure you want to delete supplier:</p>
+                <h5 class="text-center text-danger" id="deleteSupplierName"></h5>
+                <div class="alert alert-warning mt-3">
+                    <i class="bi bi-info-circle me-2"></i>
+                    <strong>Warning:</strong> This action cannot be undone. All associated data may be affected.
+                </div>
+            </div>
+            <div class="modal-footer border-0 p-4 pt-0">
+                <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-2"></i> Cancel
+                </button>
+                <form id="deleteForm" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-danger rounded-pill px-4">
+                        <i class="bi bi-trash me-2"></i> Yes, Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Delete supplier function
+    function deleteSupplier(id, name) {
+        document.getElementById('deleteSupplierName').textContent = name;
+        document.getElementById('deleteForm').action = '/admin/suppliers/delete/' + id;
+        new bootstrap.Modal(document.getElementById('deleteModal')).show();
+    }
+
+    // Edit supplier function
+    function editSupplier(id, name, contactPerson, phone, email, address) {
+        // Set form action
+        document.getElementById('editSupplierForm').action = '/admin/suppliers/update/' + id;
+
+        // Populate form fields
+        document.getElementById('editSupplierId').value = id;
+        document.getElementById('editSupplierName').value = name;
+        document.getElementById('editContactPerson').value = contactPerson;
+        document.getElementById('editPhone').value = phone;
+        document.getElementById('editEmail').value = email;
+        document.getElementById('editAddress').value = address || '';
+
+        // Show modal
+        new bootstrap.Modal(document.getElementById('editSupplierModal')).show();
+    }
+
+    // Form validation
+    document.getElementById('addSupplierForm').addEventListener('submit', function(e) {
+        const phone = document.getElementById('phone').value;
+        if (!/^[0-9]{10}$/.test(phone)) {
+            e.preventDefault();
+            alert('Please enter a valid 10-digit phone number');
+            return false;
+        }
+    });
+
+    // Auto-dismiss alerts after 5 seconds
+    document.addEventListener('DOMContentLoaded', function() {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(function(alert) {
+            setTimeout(function() {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            }, 5000);
+        });
+    });
+
+    // Phone number input validation (only digits)
+    document.querySelectorAll('input[type="tel"]').forEach(function(input) {
+        input.addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+    });
+</script>
+</body>
+</html>

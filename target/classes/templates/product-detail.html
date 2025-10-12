@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title th:text="${product.name} + ' - GreenBasket'">Product Detail</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="row">
+        <div class="col-md-8">
+            <h1 th:text="${product.name}">Product Name</h1>
+            <p class="lead" th:text="${product.description}">Product Description</p>
+
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5>Pricing Information</h5>
+                    <p class="fs-4">
+                        <strong>Retail Price:</strong>
+                        <span class="text-success">₹<span th:text="${product.retailPricePerKg}">0</span>/kg</span>
+                    </p>
+
+                    <div th:if="${currentUser != null and currentUser.isWholesale}">
+                        <hr>
+                        <p class="fs-5">
+                            <strong>Wholesale Price:</strong>
+                            <span class="text-primary">₹<span th:text="${product.wholesalePricePerKg}">0</span>/kg</span>
+                        </p>
+                        <p class="text-muted">
+                            <i class="bi bi-info-circle"></i>
+                            Minimum quantity for wholesale price:
+                            <strong><span th:text="${product.minWholesaleQuantityKg}">0</span> kg</strong>
+                        </p>
+                    </div>
+
+                    <p class="mt-3">
+                        <strong>Available Stock:</strong>
+                        <span class="badge bg-info" th:text="${product.stockKg} + ' kg'">0 kg</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Add to Cart Form (Customers Only) -->
+            <div th:if="${currentUser != null and currentUser.role.name() == 'CUSTOMER'}"
+                 class="card">
+                <div class="card-body">
+                    <h5>Add to Cart</h5>
+                    <div class="input-group mb-3">
+                        <input type="number" class="form-control" id="quantity"
+                               min="1" max="${product.stockKg}" value="1" step="0.5">
+                        <span class="input-group-text">kg</span>
+                        <button class="btn btn-success" type="button"
+                                th:onclick="'addToCart(' + ${product.id} + ', \'' + ${product.name} + '\', document.getElementById(\'quantity\').value, ' +
+                                               ${product.retailPricePerKg} + ', ' + ${product.wholesalePricePerKg} + ', ' +
+                                               ${product.minWholesaleQuantityKg} + ')'">
+                            <i class="bi bi-cart-plus"></i> Add to Cart
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5>Supplier Information</h5>
+                    <p th:if="${product.supplier != null}">
+                        <strong>Supplier:</strong> <span th:text="${product.supplier.name}">N/A</span><br>
+                        <strong>Contact:</strong> <span th:text="${product.supplier.contactPerson}">N/A</span><br>
+                        <strong>Phone:</strong> <span th:text="${product.supplier.phone}">N/A</span>
+                    </p>
+                    <p th:if="${product.supplier == null}" class="text-muted">
+                        Supplier information not available
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <a th:href="@{/products}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Products
+        </a>
+    </div>
+</div>
+</body>
+</html>

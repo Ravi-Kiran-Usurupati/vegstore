@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Checkout - GreenBasket</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <h1 class="mb-4">Checkout</h1>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5>Order Summary</h5>
+                    <div id="checkout-items">
+                        <!-- Items will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h5>Delivery Information</h5>
+                    <p><strong>Customer:</strong> <span th:text="${currentUser.fullName}">Name</span></p>
+                    <p><strong>Username:</strong> <span th:text="${currentUser.username}">Username</span></p>
+                    <p class="text-muted">
+                        <i class="bi bi-info-circle"></i>
+                        Your order will be processed and assigned to a salesperson.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5>Payment Summary</h5>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal:</span>
+                        <span>₹<span id="checkout-subtotal">0.00</span></span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-3">
+                        <strong>Total:</strong>
+                        <strong class="text-success">₹<span id="checkout-total">0.00</span></strong>
+                    </div>
+
+                    <button class="btn btn-success w-100" onclick="placeOrder()">
+                        Place Order
+                    </button>
+                    <a th:href="@{/cart}" class="btn btn-secondary w-100 mt-2">
+                        Back to Cart
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', displayCheckout);
+
+    function displayCheckout() {
+        const cart = getCart();
+        if (Object.keys(cart).length === 0) {
+            window.location.href = '/cart';
+            return;
+        }
+
+        let itemsHtml = '<ul class="list-group">';
+        let total = 0;
+
+        for (const [id, item] of Object.entries(cart)) {
+            const subtotal = item.price * item.quantity;
+            total += subtotal;
+
+            itemsHtml += `
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>${item.name}</strong><br>
+                        <small class="text-muted">${item.quantity} kg × ₹${item.price.toFixed(2)}/kg</small>
+                    </div>
+                    <span class="badge bg-success">₹${subtotal.toFixed(2)}</span>
+                </li>
+            `;
+        }
+        itemsHtml += '</ul>';
+
+        document.getElementById('checkout-items').innerHTML = itemsHtml;
+        document.getElementById('checkout-subtotal').textContent = total.toFixed(2);
+        document.getElementById('checkout-total').textContent = total.toFixed(2);
+    }
+
+    async function placeOrder() {
+        const cart = getCart();
+        if (Object.keys(cart).length === 0) {
+            alert('Your cart is empty');
+            return;
+        }
+
+        // Convert cart to the format expected by the backend
+        const cartItems = {};
+        for (const [id, item] of Object.entries(cart)) {
+            cartItems[id] = item.quantity;
+        }
+
+        try {
+            const response = await fetch('/checkout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(cartItems)
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                clearCart();
+                alert('Order placed successfully! Order ID: ' + result.orderId);
+                window.location.href = '/my-orders';
+            } else {
+                alert('Error: ' + result.message);
+            }
+        } catch (error) {
+            alert('An error occurred while placing the order');
+            console.error(error);
+        }
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Sales Dashboard - GreenBasket</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <h1 class="mb-4">Sales Dashboard</h1>
+
+    <div th:if="${param.claimed}" class="alert alert-success">
+        Order claimed successfully!
+    </div>
+    <div th:if="${param.updated}" class="alert alert-success">
+        Order status updated successfully!
+    </div>
+    <div th:if="${param.error}" class="alert alert-danger" th:text="${param.error}">
+        Error occurred
+    </div>
+
+    <!-- Available Orders Section -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Available Orders for Claiming</h5>
+        </div>
+        <div class="card-body">
+            <div th:if="${#lists.isEmpty(availableOrders)}" class="alert alert-info">
+                No orders available to claim at the moment.
+            </div>
+
+            <div class="table-responsive" th:if="${!#lists.isEmpty(availableOrders)}">
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Total Amount</th>
+                        <th>Order Date</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="order : ${availableOrders}">
+                        <td th:text="'#' + ${order.id}">1</td>
+                        <td th:text="${order.customer.fullName}">Customer</td>
+                        <td>₹<span th:text="${order.totalAmount}">0</span></td>
+                        <td th:text="${#temporals.format(order.createdAt, 'dd MMM yyyy HH:mm')}">Date</td>
+                        <td>
+                            <form th:action="@{/sales/claim-order/{id}(id=${order.id})}" method="post" style="display: inline;">
+                                <button type="submit" class="btn btn-sm btn-success">
+                                    <i class="bi bi-hand-thumbs-up"></i> Claim
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- My Assigned Orders Section -->
+    <div class="card">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">My Assigned Orders</h5>
+        </div>
+        <div class="card-body">
+            <div th:if="${#lists.isEmpty(myOrders)}" class="alert alert-info">
+                You don't have any assigned orders yet.
+            </div>
+
+            <div th:if="${!#lists.isEmpty(myOrders)}">
+                <div th:each="order : ${myOrders}" class="card mb-3">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span><strong>Order #<span th:text="${order.id}">1</span></strong></span>
+                        <span class="badge"
+                              th:classappend="${order.status.name() == 'DELIVERED'} ? 'bg-success' :
+                                                ${order.status.name() == 'PROCESSING'} ? 'bg-warning' : 'bg-secondary'"
+                              th:text="${order.status}">Status</span>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Customer:</strong> <span th:text="${order.customer.fullName}">Name</span></p>
+                        <p><strong>Total Amount:</strong> ₹<span th:text="${order.totalAmount}">0</span></p>
+                        <p><strong>Order Date:</strong> <span th:text="${#temporals.format(order.createdAt, 'dd MMM yyyy HH:mm')}">Date</span></p>
+
+                        <h6>Order Items:</h6>
+                        <ul class="list-group mb-3">
+                            <li class="list-group-item" th:each="item : ${order.orderItems}">
+                                <span th:text="${item.product.name}">Product</span> -
+                                <span th:text="${item.quantityKg} + ' kg'">1 kg</span> ×
+                                ₹<span th:text="${item.pricePerKgAtTimeOfOrder}">0</span> =
+                                ₹<span th:text="${item.subtotal}">0</span>
+                            </li>
+                        </ul>
+
+                        <form th:action="@{/sales/update-order-status}" method="post" class="d-inline">
+                            <input type="hidden" name="orderId" th:value="${order.id}">
+                            <div class="input-group" style="max-width: 400px;">
+                                <select name="status" class="form-select">
+                                    <option value="PROCESSING" th:selected="${order.status.name() == 'PROCESSING'}">Processing</option>
+                                    <option value="DELIVERED" th:selected="${order.status.name() == 'DELIVERED'}">Delivered</option>
+                                    <option value="CANCELLED" th:selected="${order.status.name() == 'CANCELLED'}">Cancelled</option>
+                                </select>
+                                <button type="submit" class="btn btn-primary">Update Status</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

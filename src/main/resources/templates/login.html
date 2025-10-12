@@ -1,0 +1,198 @@
+<!--<!DOCTYPE html>-->
+<!--<html xmlns:th="http://www.thymeleaf.org">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>Login - GreenBasket</title>-->
+<!--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">-->
+<!--    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">-->
+<!--    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">-->
+<!--    <link th:href="@{/css/style.css}" rel="stylesheet">-->
+<!--</head>-->
+<!--<body class="bg-light">-->
+<!--<div class="container">-->
+<!--    <div class="row justify-content-center align-items-center min-vh-100">-->
+<!--        <div class="col-md-5">-->
+<!--            <div class="text-center mb-4">-->
+<!--                <div class="d-inline-block bg-success bg-opacity-10 p-3 rounded-circle mb-3">-->
+<!--                    <i class="bi bi-basket2-fill fs-1 text-success"></i>-->
+<!--                </div>-->
+<!--                <h2 class="fw-bold">Welcome Back!</h2>-->
+<!--                <p class="text-muted">Sign in to continue to GreenBasket</p>-->
+<!--            </div>-->
+
+<!--            <div class="card border-0 shadow-lg rounded-4">-->
+<!--                <div class="card-body p-5">-->
+<!--                    &lt;!&ndash; Success Messages &ndash;&gt;-->
+<!--                    <div th:if="${param.registered}" class="alert alert-success rounded-pill text-center mb-4">-->
+<!--                        <i class="bi bi-check-circle me-2"></i>-->
+<!--                        Registration successful! Please login.-->
+<!--                    </div>-->
+<!--                    <div th:if="${param.logout}" class="alert alert-info rounded-pill text-center mb-4">-->
+<!--                        <i class="bi bi-info-circle me-2"></i>-->
+<!--                        You have been logged out successfully.-->
+<!--                    </div>-->
+
+<!--                    &lt;!&ndash; Error Message &ndash;&gt;-->
+<!--                    <div th:if="${param.error}" class="alert alert-danger rounded-pill text-center mb-4">-->
+<!--                        <i class="bi bi-exclamation-triangle me-2"></i>-->
+<!--                        Invalid username or password.-->
+<!--                    </div>-->
+
+<!--                    <form th:action="@{/login}" method="post">-->
+<!--                        <div class="mb-4">-->
+<!--                            <label for="username" class="form-label fw-semibold">-->
+<!--                                <i class="bi bi-person me-2"></i>Username-->
+<!--                            </label>-->
+<!--                            <input type="text" class="form-control form-control-lg" id="username"-->
+<!--                                   name="username" placeholder="Enter your username" required autofocus>-->
+<!--                        </div>-->
+
+<!--                        <div class="mb-4">-->
+<!--                            <label for="password" class="form-label fw-semibold">-->
+<!--                                <i class="bi bi-lock me-2"></i>Password-->
+<!--                            </label>-->
+<!--                            <input type="password" class="form-control form-control-lg" id="password"-->
+<!--                                   name="password" placeholder="Enter your password" required>-->
+<!--                        </div>-->
+
+<!--                        <div class="d-grid">-->
+<!--                            <button type="submit" class="btn btn-success btn-lg rounded-pill">-->
+<!--                                <i class="bi bi-box-arrow-in-right me-2"></i>Sign In-->
+<!--                            </button>-->
+<!--                        </div>-->
+<!--                    </form>-->
+
+<!--                    <hr class="my-4">-->
+
+<!--                    <p class="text-center mb-0">-->
+<!--                        Don't have an account?-->
+<!--                        <a th:href="@{/register}" class="text-success fw-semibold text-decoration-none">-->
+<!--                            Create one now <i class="bi bi-arrow-right"></i>-->
+<!--                        </a>-->
+<!--                    </p>-->
+<!--                </div>-->
+<!--            </div>-->
+
+<!--            <div class="text-center mt-4">-->
+<!--                <a th:href="@{/}" class="text-muted text-decoration-none">-->
+<!--                    <i class="bi bi-arrow-left me-2"></i>Back to Home-->
+<!--                </a>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+<!--</body>-->
+<!--</html>-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - GreenBasket</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body class="bg-light">
+<div class="container">
+    <div class="row justify-content-center align-items-center min-vh-100">
+        <div class="col-md-5">
+            <div class="text-center mb-4">
+                <div class="d-inline-block bg-success bg-opacity-10 p-3 rounded-circle mb-3">
+                    <i class="bi bi-basket2-fill fs-1 text-success"></i>
+                </div>
+                <h2 class="fw-bold">Welcome Back!</h2>
+                <p class="text-muted">Sign in to continue to GreenBasket</p>
+            </div>
+
+            <div class="card border-0 shadow-lg rounded-4">
+                <div class="card-body p-5">
+
+                    <!-- Success Messages -->
+                    <div th:if="${param.registered != null}" class="alert alert-success rounded-pill text-center mb-4">
+                        <i class="bi bi-check-circle me-2"></i>
+                        Registration successful! Please login.
+                    </div>
+
+                    <div th:if="${param.logout != null}" class="alert alert-info rounded-pill text-center mb-4">
+                        <i class="bi bi-info-circle me-2"></i>
+                        You have been logged out successfully.
+                    </div>
+
+                    <!-- Error Message -->
+                    <div th:if="${param.error != null}" class="alert alert-danger rounded-3 text-center mb-4">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        <strong>Login Failed!</strong><br>
+                        Invalid username or password. Please try again.
+                    </div>
+
+                    <!-- Test Credentials Box -->
+                    <div class="alert alert-info rounded-3 mb-4">
+                        <strong>Test Credentials:</strong><br>
+                        <small>
+                            <strong>Admin:</strong> admin / password123<br>
+                            <strong>Customer:</strong> customer1 / password123<br>
+                            <strong>Wholesale:</strong> wholesale1 / password123
+                        </small>
+                    </div>
+
+                    <form th:action="@{/login}" method="post">
+                        <div class="mb-4">
+                            <label for="username" class="form-label fw-semibold">
+                                <i class="bi bi-person me-2"></i>Username
+                            </label>
+                            <input type="text"
+                                   class="form-control form-control-lg"
+                                   id="username"
+                                   name="username"
+                                   placeholder="Enter your username"
+                                   required
+                                   autofocus
+                                   autocomplete="username">
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="password" class="form-label fw-semibold">
+                                <i class="bi bi-lock me-2"></i>Password
+                            </label>
+                            <input type="password"
+                                   class="form-control form-control-lg"
+                                   id="password"
+                                   name="password"
+                                   placeholder="Enter your password"
+                                   required
+                                   autocomplete="current-password">
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success btn-lg rounded-pill">
+                                <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+                            </button>
+                        </div>
+                    </form>
+
+                    <hr class="my-4">
+
+                    <p class="text-center mb-0">
+                        Don't have an account?
+                        <a th:href="@{/register}" class="text-success fw-semibold text-decoration-none">
+                            Create one now <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </p>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <a th:href="@{/}" class="text-muted text-decoration-none">
+                    <i class="bi bi-arrow-left me-2"></i>Back to Home
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
