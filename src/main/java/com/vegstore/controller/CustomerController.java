@@ -20,10 +20,7 @@ public class CustomerController {
 
     private final OrderService orderService;
 
-    @GetMapping("/checkout")
-    public String checkout(Model model) {
-        return "checkout";
-    }
+
 
     @PostMapping("/checkout")
     @ResponseBody
