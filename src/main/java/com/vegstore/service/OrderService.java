@@ -2,12 +2,17 @@ package com.vegstore.service;
 
 import com.vegstore.entity.*;
 import com.vegstore.repository.OrderRepository;
+import com.vegstore.repository.ProductRepository;
 import com.vegstore.repository.PurchaseRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+// Add these Jackson imports
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,62 +24,108 @@ import java.util.Map;
 public class OrderService {
 
     private final OrderRepository orderRepository;
-
+    private final ProductRepository productRepository;  // ADDED
     private final ProductService productService;
-
     private final PurchaseRepository purchaseRepository;
+    private final CartService cartService;  // ADDED
+    private final ObjectMapper objectMapper;  // ADDED
 
     @Transactional
-    public Order createOrder(User customer, Map<Long, Double> cartItems) {
-        log.info("Creating order for customer: {}", customer.getUsername());
+    public Order createOrder(User customer, String customerName, String customerPhone,
+                             String deliveryAddress, String city, String pincode,
+                             String deliveryNotes, String paymentMethod, String cartDataJson) {
 
-        Order order = Order.builder()
-                .customer(customer)
-                .status(Order.OrderStatus.PENDING)
-                .createdAt(LocalDateTime.now())
-                .build();
+        try {
+            log.info("=== OrderService.createOrder START ===");
+            log.info("Customer: {} (ID: {})", customer.getUsername(), customer.getId());
+            log.info("Cart JSON: {}", cartDataJson);
 
-        BigDecimal totalAmount = BigDecimal.ZERO;
-
-        for (Map.Entry<Long, Double> entry : cartItems.entrySet()) {
-            Long productId = entry.getKey();
-            Double quantity = entry.getValue();
-
-            Product product = productService.getProductById(productId);
-
-            if (product.getStockKg() < quantity) {
-                throw new RuntimeException("Insufficient stock for product: " + product.getName());
-            }
-
-            BigDecimal pricePerKg = product.getPriceForCustomer(
-                    customer.getIsWholesale(),
-                    quantity
+            // Parse cart data
+            List<Map<String, Object>> cartItems = objectMapper.readValue(
+                    cartDataJson,
+                    new TypeReference<List<Map<String, Object>>>() {}
             );
 
-            OrderItem orderItem = OrderItem.builder()
-                    .product(product)
-                    .quantityKg(quantity)
-                    .pricePerKgAtTimeOfOrder(pricePerKg)
+            log.info("Parsed {} cart items", cartItems.size());
+
+            if (cartItems.isEmpty()) {
+                throw new RuntimeException("Cart is empty");
+            }
+
+            // Create order
+            Order order = Order.builder()
+                    .customer(customer)
+                    .customerName(customerName)
+                    .customerPhone(customerPhone)
+                    .deliveryAddress(deliveryAddress)
+                    .city(city)
+                    .pincode(pincode)
+                    .deliveryNotes(deliveryNotes)
+                    .paymentMethod(paymentMethod)
+                    .status(Order.OrderStatus.PENDING)
                     .build();
 
-            order.addOrderItem(orderItem);
+            log.info("Order object created");
 
-            BigDecimal itemSubtotal = pricePerKg.multiply(BigDecimal.valueOf(quantity));
-            totalAmount = totalAmount.add(itemSubtotal);
+            BigDecimal totalAmount = BigDecimal.ZERO;
 
-            productService.decreaseStock(productId, quantity);
+            // Create order items
+            for (Map<String, Object> cartItem : cartItems) {
+                Long productId = ((Number) cartItem.get("productId")).longValue();
+                Double quantity = ((Number) cartItem.get("quantity")).doubleValue();
+                Double price = ((Number) cartItem.get("price")).doubleValue();
 
-            log.info("Added order item - Product: {}, Quantity: {} kg, Price: {} per kg",
-                    product.getName(), quantity, pricePerKg);
+                log.info("Processing item: Product ID={}, Quantity={}, Price={}", productId, quantity, price);
+
+                Product product = productRepository.findById(productId)
+                        .orElseThrow(() -> new RuntimeException("Product not found: " + productId));
+
+                BigDecimal pricePerKg = BigDecimal.valueOf(price);
+                BigDecimal subtotal = pricePerKg.multiply(BigDecimal.valueOf(quantity));
+
+                OrderItem orderItem = OrderItem.builder()
+                        .product(product)
+                        .quantityKg(quantity)
+                        .pricePerKgAtTimeOfOrder(pricePerKg)
+                        .subtotal(subtotal)
+                        .build();
+
+                order.addOrderItem(orderItem);
+                totalAmount = totalAmount.add(subtotal);
+
+                // Update product stock
+                double newStock = product.getStockKg() - quantity;
+                log.info("Updating product stock: {} -> {}", product.getStockKg(), newStock);
+                product.setStockKg(newStock);
+                productRepository.save(product);
+            }
+
+            // Add delivery fee if needed
+            if (totalAmount.compareTo(BigDecimal.valueOf(500)) < 0) {
+                log.info("Adding delivery fee ₹50 (subtotal < ₹500)");
+                totalAmount = totalAmount.add(BigDecimal.valueOf(50));
+            }
+
+            order.setTotalAmount(totalAmount);
+
+            // Save order
+            log.info("Saving order to database...");
+            Order savedOrder = orderRepository.save(order);
+            log.info("Order saved with ID: {}", savedOrder.getId());
+
+            // Clear customer's cart
+            log.info("Clearing cart for customer: {}", customer.getUsername());
+            cartService.clearCart(customer);
+            log.info("Cart cleared successfully");
+
+            log.info("=== OrderService.createOrder SUCCESS ===");
+            return savedOrder;
+
+        } catch (Exception e) {
+            log.error("=== OrderService.createOrder FAILED ===");
+            log.error("Error: {}", e.getMessage(), e);
+            throw new RuntimeException("Failed to create order: " + e.getMessage(), e);
         }
-
-        order.setTotalAmount(totalAmount);
-        Order savedOrder = orderRepository.save(order);
-
-        log.info("Order created successfully with ID: {} and total amount: {}",
-                savedOrder.getId(), totalAmount);
-
-        return savedOrder;
     }
 
     public List<Order> getCustomerOrders(User customer) {
