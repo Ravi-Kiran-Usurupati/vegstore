@@ -23,7 +23,7 @@
 }
 
 body {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Poppins', 'sans-serif';
     background-color: #ffffff;
     color: #1f2937;
     line-height: 1.6;
@@ -313,7 +313,7 @@ footer a:hover {
     border-right-color: transparent;
 }
 
-/* Scrollbar Styling */
+/* Scrollbar Styling*/
 ::-webkit-scrollbar {
     width: 12px;
 }

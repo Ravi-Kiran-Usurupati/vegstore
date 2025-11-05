@@ -69,7 +69,7 @@ public class CreateAdminUser {
                 .isWholesale(false)
                 .build();
         userRepository.save(admin);
-        log.info("✅ Created: admin");
+        log.info(" Created: admin");
 
         // Salesperson
         User sales1 = User.builder()
@@ -80,34 +80,34 @@ public class CreateAdminUser {
                 .isWholesale(false)
                 .build();
         userRepository.save(sales1);
-        log.info("✅ Created: sales1");
+        log.info(" Created: sales1");
 
         // Retail Customers
         User ravi = User.builder()
                 .username("ravi")
                 .password(customerPassword)
-                .fullName("Ravi Kumar")
+                .fullName("Ravi Kiran")
                 .role(User.Role.CUSTOMER)
                 .isWholesale(false)
                 .build();
         userRepository.save(ravi);
-        log.info("✅ Created: ravi (Retail Customer)");
+        log.info(" Created: ravi (Retail Customer)");
 
         User jaya = User.builder()
                 .username("jaya")
                 .password(customerPassword)
-                .fullName("Jaya Lakshmi")
+                .fullName("Jaya Charan")
                 .role(User.Role.CUSTOMER)
                 .isWholesale(false)
                 .build();
         userRepository.save(jaya);
-        log.info("✅ Created: jaya (Retail Customer)");
+        log.info(" Created: jaya (Retail Customer)");
 
         // Wholesale Customers
         User wholesale1 = User.builder()
                 .username("wholesale1")
                 .password(customerPassword)
-                .fullName("Hotel Raj Wholesale")
+                .fullName("Hotel Phoniex Wholesale")
                 .role(User.Role.CUSTOMER)
                 .isWholesale(true)
                 .build();
@@ -116,12 +116,12 @@ public class CreateAdminUser {
         User wholesale2 = User.builder()
                 .username("wholesale2")
                 .password(customerPassword)
-                .fullName("Krishna Mess Wholesale")
+                .fullName("Jaya Mess Wholesale")
                 .role(User.Role.CUSTOMER)
                 .isWholesale(true)
                 .build();
         userRepository.save(wholesale2);
-        log.info("✅ Created: wholesale customers");
+        log.info(" Created: wholesale customers");
 
         log.info("Total users created: {}", userRepository.count());
     }
@@ -137,35 +137,35 @@ public class CreateAdminUser {
         // Supplier 1 - Ganesh
         Supplier ganesh = Supplier.builder()
                 .name("Ganesh Fresh Vegetables")
-                .contactPerson("Ganesh Reddy")
+                .contactPerson("Ganesh")
                 .phone("9876543210")
                 .email("ganesh@freshveggies.com")
-                .address("MG Road, Benz Circle, Vijayawada, Andhra Pradesh - 520010")
+                .address("Vijayawada, Andhra Pradesh - 520010")
                 .build();
         supplierRepository.save(ganesh);
-        log.info("✅ Created supplier: Ganesh Fresh Vegetables");
+        log.info(" Created supplier: Ganesh Fresh Vegetables");
 
         // Supplier 2 - Koti
         Supplier koti = Supplier.builder()
                 .name("Koti Organic Farms")
-                .contactPerson("Koti Vara Prasad")
+                .contactPerson("Koti")
                 .phone("9876543211")
                 .email("koti@organicfarms.com")
-                .address("Gunadala, Vijayawada, Andhra Pradesh - 520004")
+                .address("Vijayawada, Andhra Pradesh - 520004")
                 .build();
         supplierRepository.save(koti);
-        log.info("✅ Created supplier: Koti Organic Farms");
+        log.info(" Created supplier: Koti Organic Farms");
 
         // Supplier 3 - Swaroop
         Supplier swaroop = Supplier.builder()
                 .name("Swaroop Vegetable Suppliers")
-                .contactPerson("Swaroop Krishna")
+                .contactPerson("Swaroop ")
                 .phone("9876543212")
                 .email("swaroop@vegsuppliers.com")
-                .address("Bhavanipuram, Vijayawada, Andhra Pradesh - 520012")
+                .address(" Vijayawada, Andhra Pradesh - 520012")
                 .build();
         supplierRepository.save(swaroop);
-        log.info("✅ Created supplier: Swaroop Vegetable Suppliers");
+        log.info(" Created supplier: Swaroop Vegetable Suppliers");
 
         log.info("Total suppliers created: {}", supplierRepository.count());
     }
@@ -237,31 +237,9 @@ public class CreateAdminUser {
                 .build();
         productRepository.save(spinach);
 
-        Product coriander = Product.builder()
-                .name("Coriander (Kothimeera)")
-                .description("Fresh organic coriander leaves")
-                .category("Leafy")
-                .retailPricePerKg(new BigDecimal("60.00"))
-                .wholesalePricePerKg(new BigDecimal("50.00"))
-                .minWholesaleQuantityKg(3.0)
-                .stockKg(50.0)
-                .imageUrl("https://images.unsplash.com/photo-1615485500834-bc10199bc94c?w=400")
-                .supplier(koti)
-                .build();
-        productRepository.save(coriander);
 
-        Product brinjal = Product.builder()
-                .name("Brinjal (Vankaya)")
-                .description("Fresh purple brinjal, ideal for curries")
-                .category("Fruiting")
-                .retailPricePerKg(new BigDecimal("38.00"))
-                .wholesalePricePerKg(new BigDecimal("32.00"))
-                .minWholesaleQuantityKg(10.0)
-                .stockKg(120.0)
-                .imageUrl("https://images.unsplash.com/photo-1618164436241-4473940d1f5c?w=400")
-                .supplier(koti)
-                .build();
-        productRepository.save(brinjal);
+
+
 
         // Products from Swaroop Vegetable Suppliers
         Product capsicum = Product.builder()
@@ -316,70 +294,46 @@ public class CreateAdminUser {
                 .build();
         productRepository.save(cucumber);
 
-        Product beans = Product.builder()
-                .name("Green Beans (Chikkudu Kaya)")
-                .description("Fresh green beans")
-                .category("Beans")
-                .retailPricePerKg(new BigDecimal("65.00"))
-                .wholesalePricePerKg(new BigDecimal("55.00"))
-                .minWholesaleQuantityKg(5.0)
-                .stockKg(75.0)
-                .imageUrl("https://images.unsplash.com/photo-1587411768638-e146e2664780?w=400")
-                .supplier(swaroop)
-                .build();
-        productRepository.save(beans);
 
-        Product ladyFinger = Product.builder()
-                .name("Lady Finger (Bendakaya)")
-                .description("Fresh okra/bhindi")
-                .category("Fruiting")
-                .retailPricePerKg(new BigDecimal("48.00"))
-                .wholesalePricePerKg(new BigDecimal("40.00"))
-                .minWholesaleQuantityKg(8.0)
-                .stockKg(95.0)
-                .imageUrl("https://images.unsplash.com/photo-1626775238053-4315516eedc9?w=400")
-                .supplier(koti)
-                .build();
-        productRepository.save(ladyFinger);
 
-        log.info("✅ Created {} products", productRepository.count());
+
+
+        log.info(" Created {} products", productRepository.count());
     }
 
     private void printLoginCredentials() {
+
+        log.info("               GREENBASKET - LOGIN CREDENTIALS          ");
         log.info("");
-        log.info("╔═════════════════════════════════════════════════════════════╗");
-        log.info("║              🌿 GREENBASKET - LOGIN CREDENTIALS 🌿         ║");
-        log.info("╠═════════════════════════════════════════════════════════════╣");
-        log.info("║                                                             ║");
-        log.info("║  📍 LOCATION: Vijayawada, Andhra Pradesh                   ║");
-        log.info("║                                                             ║");
-        log.info("║  🔑 ADMIN ACCOUNT                                          ║");
-        log.info("║     Username: admin                                         ║");
-        log.info("║     Password: admin123                                      ║");
-        log.info("║                                                             ║");
-        log.info("║  🔑 SALESPERSON ACCOUNT                                    ║");
-        log.info("║     Username: sales1                                        ║");
-        log.info("║     Password: sales123                                      ║");
-        log.info("║                                                             ║");
-        log.info("║  🔑 RETAIL CUSTOMERS                                       ║");
-        log.info("║     Username: ravi      | Full Name: Ravi Kumar            ║");
-        log.info("║     Username: jaya      | Full Name: Jaya Lakshmi          ║");
-        log.info("║     Password: password123 (for both)                        ║");
-        log.info("║                                                             ║");
-        log.info("║  🔑 WHOLESALE CUSTOMERS                                    ║");
-        log.info("║     Username: wholesale1 | Name: Hotel Raj Wholesale       ║");
-        log.info("║     Username: wholesale2 | Name: Krishna Mess Wholesale    ║");
-        log.info("║     Password: password123 (for both)                        ║");
-        log.info("║                                                             ║");
-        log.info("║  🚚 SUPPLIERS                                               ║");
-        log.info("║     1. Ganesh Fresh Vegetables (MG Road, Vijayawada)       ║");
-        log.info("║     2. Koti Organic Farms (Gunadala, Vijayawada)           ║");
-        log.info("║     3. Swaroop Vegetable Suppliers (Bhavanipuram)          ║");
-        log.info("║                                                             ║");
-        log.info("║  📦 PRODUCTS: 12 fresh vegetables with Indian names        ║");
-        log.info("║                                                             ║");
-        log.info("╚═════════════════════════════════════════════════════════════╝");
-        log.info("");
+        log.info("                                                             ");
+        log.info("   LOCATION: Vijayawada, Andhra Pradesh                   ");
+        log.info("                                                             ");
+        log.info("   ADMIN ACCOUNT                                          ");
+        log.info("     Username: admin                                         ");
+        log.info("     Password: admin123                                      ");
+        log.info("                                                             ");
+        log.info("   SALESPERSON ACCOUNT                                    ");
+        log.info("     Username: sales1                                        ");
+        log.info("     Password: sales123                                      ");
+        log.info("                                                             ");
+        log.info("   RETAIL CUSTOMERS                                       ");
+        log.info("     Username: ravi      | Full Name: Ravi Kiran            ");
+        log.info("     Username: jaya      | Full Name: Jaya Charan          ");
+        log.info("     Password: password123 (for both)                        ");
+        log.info("                                                             ");
+        log.info("   WHOLESALE CUSTOMERS                                    ");
+        log.info("     Username: wholesale1 | Name: Hotel Phoniex Wholesale       ");
+        log.info("    Username: wholesale2 | Name: jaya Mess Wholesale    ");
+        log.info("    Password: password123 (for both)                        ");
+        log.info("                                                             ");
+        log.info("  SUPPLIERS                                               ");
+        log.info("     1. Ganesh Fresh Vegetables ( Vijayawada)       ");
+        log.info("    2. Koti Organic Farms ( Vijayawada)           ");
+        log.info("     3. Swaroop Vegetable Suppliers ( Vijayawada)          ");
+        log.info("                                                             ");
+        log.info("   PRODUCTS: 8 fresh vegetables         ");
+        log.info("                                                            ");
+
         log.info(" Access the application at: http://localhost:8081");
         log.info("");
     }
