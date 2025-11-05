@@ -77,10 +77,10 @@
                 </li>
 
                 <!-- Authenticated User -->
-                <li class="nav-item dropdown ms-2" sec:authorize="isAuthenticated()">
-                    <a class="nav-link dropdown-toggle btn btn-outline-dark rounded-pill px-3"
-                       href="#" role="button" data-bs-toggle="dropdown">
-                        <i class="bi bi-person-circle me-1"></i>
+                <li class="nav-item ms-2" sec:authorize="isAuthenticated()">
+                    <a class="nav-link  d-flex align-items-center text-decoration-none px-3 py-2 rounded-pill"
+                       href="#" role="button" data-bs-toggle="dropdown" style="border: 1px solid #dee2e6;">
+                        <i class="bi bi-person-circle me-2"></i>
                         <span th:text="${currentUser?.fullName}">User</span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2">
@@ -268,15 +268,16 @@
 </section>
 
 <!-- CTA Section -->
-<section class="py-5 bg-gradient-custom text-white">
+<section class="py-5 bg-gradient-custom text-white" sec:authorize="!isAuthenticated()">
     <div class="container text-center py-5">
         <h2 class="display-5 fw-bold mb-4">Ready to Get Started?</h2>
         <p class="lead mb-4">Join thousands of satisfied customers enjoying fresh vegetables daily!</p>
-        <a href="@{/register}" class="btn btn-warning btn-lg rounded-pill px-5 shadow-lg">
+        <a th:href="@{/register}" class="btn btn-warning btn-lg rounded-pill px-5 shadow-lg">
             <i class="bi bi-person-plus me-2"></i> Create Account Now
         </a>
     </div>
 </section>
+
 
 <!-- Footer -->
 <footer class="bg-dark text-white py-5 mt-5">

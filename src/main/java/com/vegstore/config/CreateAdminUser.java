@@ -28,9 +28,8 @@ public class CreateAdminUser {
     @Bean
     public CommandLineRunner initializeData() {
         return args -> {
-            log.info("========================================");
+
             log.info("Starting Database Initialization...");
-            log.info("========================================");
 
             // Create Users (Admin, Sales, Customers)
             createUsers();
@@ -41,9 +40,9 @@ public class CreateAdminUser {
             // Create Products
             createProducts();
 
-            log.info("========================================");
+
             log.info("Database Initialization Complete!");
-            log.info("========================================");
+
             printLoginCredentials();
         };
     }
@@ -75,12 +74,22 @@ public class CreateAdminUser {
         User sales1 = User.builder()
                 .username("sales1")
                 .password(salesPassword)
-                .fullName("Sales Person")
+                .fullName("Sales Person 1")
                 .role(User.Role.SALESPERSON)
                 .isWholesale(false)
                 .build();
         userRepository.save(sales1);
         log.info(" Created: sales1");
+
+        User sales2 = User.builder()
+                .username("sales2")
+                .password(salesPassword)
+                .fullName("Sales Person 2")
+                .role(User.Role.SALESPERSON)
+                .isWholesale(false)
+                .build();
+        userRepository.save(sales2);
+        log.info(" Created: sales2");
 
         // Retail Customers
         User ravi = User.builder()
