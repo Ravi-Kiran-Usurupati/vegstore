@@ -1,162 +1,3 @@
-<!--<!DOCTYPE html>-->
-<!--<html xmlns:th="http://www.thymeleaf.org">-->
-<!--<head>-->
-
-
-<!--    <meta charset="UTF-8">-->
-<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
-<!--    <title>Sales Dashboard - GreenBasket</title>-->
-
-<!--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">-->
-<!--    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">-->
-<!--    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">-->
-<!--    <link th:href="@{/css/style.css}" rel="stylesheet">-->
-
-<!--</head>-->
-<!--<body>-->
-<!--<nav class="navbar navbar-expand-lg navbar-dark bg-gradient-primary sticky-top shadow-sm">-->
-<!--    <div class="container-fluid px-4">-->
-<!--        <a class="navbar-brand" th:href="@{/sales/dashboard}">-->
-<!--            <i class="bi bi-basket2-fill me-2"></i> GreenBasket Sales-->
-<!--        </a>-->
-<!--        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#salesNav">-->
-<!--            <span class="navbar-toggler-icon"></span>-->
-<!--        </button>-->
-<!--        <div class="collapse navbar-collapse" id="salesNav">-->
-<!--            <ul class="navbar-nav me-auto mb-2 mb-lg-0">-->
-<!--                <li class="nav-item">-->
-<!--                    <a class="nav-link" th:href="@{/}">-->
-<!--                        <i class="bi bi-arrow-left-circle me-1"></i> Back to Store-->
-<!--                    </a>-->
-<!--                </li>-->
-<!--            </ul>-->
-<!--            <span class="navbar-text text-white me-3">-->
-<!--                <i class="bi bi-person-circle me-1"></i>-->
-<!--                <span th:text="${currentUser?.fullName}">Salesperson</span>-->
-<!--            </span>-->
-<!--            <form th:action="@{/logout}" method="post" class="d-inline">-->
-<!--                <button type="submit" class="btn btn-outline-light btn-sm">-->
-<!--                    <i class="bi bi-box-arrow-right me-1"></i> Logout-->
-<!--                </button>-->
-<!--            </form>-->
-<!--        </div>-->
-<!--    </div>-->
-<!--</nav>-->
-
-<!--<div class="bg-light py-4">-->
-<!--    <div class="container">-->
-<!--        <h1 class="mb-0">Sales Dashboard</h1>-->
-<!--    </div>-->
-<!--</div>-->
-
-<!--<main class="container py-5">-->
-<!--    <div th:if="${claimed}" class="alert alert-success alert-dismissible fade show" role="alert">-->
-<!--        Order claimed successfully!-->
-<!--        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>-->
-<!--    </div>-->
-<!--    <div th:if="${updated}" class="alert alert-success alert-dismissible fade show" role="alert">-->
-<!--        Order status updated successfully!-->
-<!--        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>-->
-<!--    </div>-->
-<!--    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">-->
-<!--        <span th:text="${error}">Error occurred</span>-->
-<!--        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>-->
-<!--    </div>-->
-
-
-<!--    <div class="card mb-4">-->
-<!--        <div class="card-header bg-primary text-white">-->
-<!--            <h5 class="mb-0">Available Orders for Claiming</h5>-->
-<!--        </div>-->
-<!--        <div class="card-body">-->
-<!--            <div th:if="${#lists.isEmpty(availableOrders)}" class="alert alert-info">-->
-<!--                No orders available to claim at the moment.-->
-<!--            </div>-->
-
-<!--            <div class="table-responsive" th:if="${!#lists.isEmpty(availableOrders)}">-->
-<!--                <table class="table table-hover">-->
-<!--                    <thead>-->
-<!--                    <tr>-->
-<!--                        <th>Order ID</th>-->
-<!--                        <th>Customer</th>-->
-<!--                        <th>Total Amount</th>-->
-<!--                        <th>Order Date</th>-->
-<!--                        <th>Action</th>-->
-<!--                    </tr>-->
-<!--                    </thead>-->
-<!--                    <tbody>-->
-<!--                    <tr th:each="order : ${availableOrders}">-->
-<!--                        <td th:text="'#' + ${order.id}">1</td>-->
-<!--                        <td th:text="${order.customer.fullName}">Customer</td>-->
-<!--                        <td>₹<span th:text="${order.totalAmount}">0</span></td>-->
-<!--                        <td th:text="${#temporals.format(order.createdAt, 'dd MMM yyyy HH:mm')}">Date</td>-->
-<!--                        <td>-->
-<!--                            <form th:action="@{/sales/claim-order/{id}(id=${order.id})}" method="post" style="display: inline;">-->
-<!--                                <button type="submit" class="btn btn-sm btn-success">-->
-<!--                                    <i class="bi bi-hand-thumbs-up"></i> Claim-->
-<!--                                </button>-->
-<!--                            </form>-->
-<!--                        </td>-->
-<!--                    </tr>-->
-<!--                    </tbody>-->
-<!--                </table>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </div>-->
-
-<!--    <div class="card">-->
-<!--        <div class="card-header bg-success text-white">-->
-<!--            <h5 class="mb-0">My Assigned Orders</h5>-->
-<!--        </div>-->
-<!--        <div class="card-body">-->
-<!--            <div th:if="${#lists.isEmpty(myOrders)}" class="alert alert-info">-->
-<!--                You don't have any assigned orders yet.-->
-<!--            </div>-->
-
-<!--            <div th:if="${!#lists.isEmpty(myOrders)}">-->
-<!--                <div th:each="order : ${myOrders}" class="card mb-3">-->
-<!--                    <div class="card-header d-flex justify-content-between align-items-center">-->
-<!--                        <span><strong>Order #<span th:text="${order.id}">1</span></strong></span>-->
-<!--                        <span class="badge"-->
-<!--                              th:classappend="${order.status.name() == 'DELIVERED'} ? 'bg-success' : (${order.status.name() == 'PROCESSING'} ? 'bg-warning' : 'bg-secondary')"-->
-<!--                              th:text="${order.status}">Status</span>-->
-<!--                    </div>-->
-<!--                    <div class="card-body">-->
-<!--                        <p><strong>Customer:</strong> <span th:text="${order.customer.fullName}">Name</span></p>-->
-<!--                        <p><strong>Total Amount:</strong> ₹<span th:text="${order.totalAmount}">0</span></p>-->
-<!--                        <p><strong>Order Date:</strong> <span th:text="${#temporals.format(order.createdAt, 'dd MMM yyyy HH:mm')}">Date</span></p>-->
-
-<!--                        <h6>Order Items:</h6>-->
-<!--                        <ul class="list-group mb-3">-->
-<!--                            <li class="list-group-item" th:each="item : ${order.orderItems}">-->
-<!--                                <span th:text="${item.product.name}">Product</span> - -->
-<!--                                <span th:text="${item.quantityKg} + ' kg'">1 kg</span> ×-->
-<!--                                ₹<span th:text="${item.pricePerKgAtTimeOfOrder}">0</span> =-->
-<!--                                ₹<span th:text="${item.subtotal}">0</span>-->
-<!--                            </li>-->
-<!--                        </ul>-->
-
-<!--                        <form th:action="@{/sales/update-order-status}" method="post" class="d-inline">-->
-<!--                            <input type="hidden" name="orderId" th:value="${order.id}">-->
-<!--                            <div class="input-group" style="max-width: 400px;">-->
-<!--                                <select name="status" class="form-select">-->
-<!--                                    <option value="PROCESSING" th:selected="${order.status.name() == 'PROCESSING'}">Processing</option>-->
-<!--                                    <option value="DELIVERED" th:selected="${order.status.name() == 'DELIVERED'}">Delivered</option>-->
-<!--                                    <option value="CANCELLED" th:selected="${order.status.name() == 'CANCELLED'}">Cancelled</option>-->
-<!--                                </select>-->
-<!--                                <button type="submit" class="btn btn-primary">Update Status</button>-->
-<!--                            </div>-->
-<!--                        </form>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </div>-->
-<!--</main>-->
-<!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>-->
-<!--</body>-->
-<!--</html>-->
-
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -170,177 +11,21 @@
     <link th:href="@{/css/style.css}" rel="stylesheet">
 
     <style>
-        /* Enhanced Navbar */
-        .sales-navbar {
-            padding-top: 1rem;
-            padding-bottom: 1rem;
-            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%) !important;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-
-        .navbar-brand {
-            font-size: 1.6rem;
-            font-weight: 700;
-        }
-
-        .brand-icon {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 8px;
-            border-radius: 12px;
-        }
-
-        .nav-link {
-            font-weight: 500;
-            padding: 8px 16px;
-            border-radius: 6px;
-            transition: all 0.3s ease;
-        }
-
-        .nav-link:hover {
-            background-color: rgba(255,255,255,0.1);
-            transform: translateY(-2px);
-        }
-
-        .btn-outline-light:hover {
-            background-color: rgba(255,255,255,0.1);
-        }
-
-        /* Dashboard Header */
-        .dashboard-header {
-            background-color: var(--light-bg);
-            padding: 2rem 0;
-            margin-bottom: 2rem;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-        }
-
-        .welcome-text {
-            font-weight: 600;
-            color: var(--primary-dark);
-        }
-
-        /* Stats Cards */
-        .stats-container {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .stat-card {
-            flex: 1;
-            background: white;
-            border-radius: 20px;
-            padding: 1rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            border-left: 4px solid var(--primary-green);
-            transition: transform 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-3px);
-        }
-
-        .stat-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--primary-dark);
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-label {
-            color: #6c757d;
-            font-weight: 500;
-        }
-
-        /* Enhanced Cards */
-        .dashboard-card {
-            border-radius: 12px;
-            overflow: hidden;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            border: none;
-        }
-
-        .card-header {
-            padding: 1.25rem 1.5rem;
-            font-weight: 600;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-        }
-
-        .order-card {
-            border-radius: 10px;
-            margin-bottom: 1.5rem;
-            border: 1px solid rgba(0,0,0,0.08);
-            transition: all 0.3s ease;
-        }
-
-        .order-card:hover {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-
-        .order-card .card-header {
-            background-color: rgba(16, 185, 129, 0.05);
-            border-bottom: 1px solid rgba(16, 185, 129, 0.1);
-        }
-
-        /* Table Enhancements */
-        .table th {
-            border-top: none;
-            font-weight: 600;
-            color: #6c757d;
-            padding: 1rem 0.75rem;
-        }
-
-        .table td {
-            padding: 1rem 0.75rem;
-            vertical-align: middle;
-        }
-
-        /* Badge Improvements */
-        .badge {
-            padding: 0.5rem 0.75rem;
-            font-weight: 500;
-            border-radius: 6px;
-        }
-
-        /* Alert Improvements */
-        .alert {
-            border-radius: 10px;
-            border-left: 4px solid;
-            padding: 1rem 1.25rem;
-        }
-
-        /* Button Improvements */
-        .btn {
-            border-radius: 8px;
-            font-weight: 500;
-            padding: 0.5rem 1rem;
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
-            border: none;
-        }
-
-        .btn-success:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
-        }
-
-        /* Responsive Adjustments */
-        @media (max-width: 768px) {
-            .stats-container {
-                flex-direction: column;
-            }
-
-            .navbar-brand {
-                font-size: 1.4rem;
-            }
-
-            .sales-navbar {
-                padding-top: 1rem;
-                padding-bottom: 1rem;
-            }
-        }
+        .stats-container {display: flex;gap:1rem;margin-bottom:2rem;}
+        .stat-card {flex:1;background:white;border-radius:20px;padding:1rem;box-shadow:0 2px 8px rgba(0,0,0,0.08);border-left:4px solid var(--primary-green);}
+        .stat-value {font-size:2rem;font-weight:700;color:var(--primary-dark);margin-bottom:0.5rem;}
+        .stat-label {color:#6c757d;font-weight:500;}
+        @media (max-width: 768px) {.stats-container {flex-direction:column;}}
+        .order-card {border-radius:10px;margin-bottom:1rem;border:1px solid rgba(0,0,0,0.08);}
+        .order-card:hover {box-shadow:0 4px 12px rgba(0,0,0,0.1);}
+        .order-card .card-header {background-color:rgba(16,185,129,0.05);}
+        .badge {padding:0.5rem 0.75rem;font-weight:500;border-radius:6px;}
+        .alert {border-radius:10px;padding:1rem 1.25rem;}
+        .btn {border-radius:8px;font-weight:500;padding:0.5rem 1rem;}
+        .btn-success {background:linear-gradient(135deg,var(--primary-green) 0%,var(--primary-dark) 100%);border:none;}
+        /* Responsive order section */
+        .dashboard-header {background-color:var(--light-bg);padding:2rem 0;margin-bottom:2rem;border-bottom:1px solid rgba(0,0,0,0.05);}
+        .welcome-text {font-weight:600;color:var(--primary-dark);}
     </style>
 </head>
 <body>
@@ -389,6 +74,10 @@
                     <div class="stat-card">
                         <div class="stat-value" th:text="${availableOrders != null ? #lists.size(availableOrders) : '0'}">0</div>
                         <div class="stat-label">Available Orders</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" th:text="${salaryAmount != null ? salaryAmount : '₹0'}">₹0</div>
+                        <div class="stat-label">My Salary Earned</div>
                     </div>
                 </div>
             </div>
@@ -439,7 +128,7 @@
                         <td>₹<span th:text="${order.totalAmount}">0</span></td>
                         <td th:text="${#temporals.format(order.createdAt, 'dd MMM yyyy HH:mm')}">Date</td>
                         <td>
-                            <form th:action="@{/sales/claim-order/{id}(id=${order.id})}" method="post" style="display: inline;">
+                            <form th:action="@{/sales/claim-order/{orderId}(orderId=${order.id})}" method="post" style="display:inline;">
                                 <button type="submit" class="btn btn-sm btn-success">
                                     <i class="bi bi-hand-thumbs-up me-1"></i> Claim
                                 </button>
@@ -467,7 +156,9 @@
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <span><strong>Order #<span th:text="${order.id}">1</span></strong></span>
                         <span class="badge"
-                              th:classappend="${order.status.name() == 'DELIVERED'} ? 'bg-success' : (${order.status.name() == 'PROCESSING'} ? 'bg-warning' : 'bg-secondary')"
+                              th:classappend="${order.status.name() == 'COMPLETED'} ? 'bg-success' :
+                                            (${order.status.name() == 'DELIVERED'} ? 'bg-info' :
+                                            (${order.status.name() == 'PROCESSING'} ? 'bg-warning' : 'bg-secondary'))"
                               th:text="${order.status}">Status</span>
                     </div>
                     <div class="card-body">
@@ -486,22 +177,26 @@
                         <h6><i class="bi bi-list-ul me-1"></i> Order Items:</h6>
                         <ul class="list-group mb-3">
                             <li class="list-group-item d-flex justify-content-between align-items-center" th:each="item : ${order.orderItems}">
-                                <div>
-                                    <span th:text="${item.product.name}">Product</span> -
-                                    <span th:text="${item.quantityKg} + ' kg'">1 kg</span> ×
-                                    ₹<span th:text="${item.pricePerKgAtTimeOfOrder}">0</span>
-                                </div>
+                                <div><span th:text="${item.product.name}">Product</span>
+                                    - <span th:text="${item.quantityKg} + ' kg'">1 kg</span>
+                                    × ₹<span th:text="${item.pricePerKgAtTimeOfOrder}">0</span></div>
                                 <span class="badge bg-primary rounded-pill">₹<span th:text="${item.subtotal}">0</span></span>
                             </li>
                         </ul>
 
-                        <form th:action="@{/sales/update-order-status}" method="post" class="d-inline">
+                        <div th:if="${order.status.name() == 'COMPLETED'}" class="my-2 text-success fw-bold">
+                            <i class="bi bi-check-circle me-1"></i> Order Completed — status locked. <br>
+                            Salary on this order: <span class="badge bg-warning text-dark">₹<span th:text="${#numbers.formatDecimal(order.totalAmount * 0.1, 1, 'COMMA', 2, 'POINT')}">0.00</span></span>
+                        </div>
+                        <form th:if="${order.status.name() != 'COMPLETED'}"
+                              th:action="@{/sales/update-order-status}" method="post" class="d-inline">
                             <input type="hidden" name="orderId" th:value="${order.id}">
                             <div class="input-group" style="max-width: 400px;">
                                 <select name="status" class="form-select">
                                     <option value="PROCESSING" th:selected="${order.status.name() == 'PROCESSING'}">Processing</option>
                                     <option value="DELIVERED" th:selected="${order.status.name() == 'DELIVERED'}">Delivered</option>
                                     <option value="CANCELLED" th:selected="${order.status.name() == 'CANCELLED'}">Cancelled</option>
+                                    <option value="COMPLETED" th:selected="${order.status.name() == 'COMPLETED'}">Completed</option>
                                 </select>
                                 <button type="submit" class="btn btn-primary">
                                     <i class="bi bi-arrow-clockwise me-1"></i> Update Status

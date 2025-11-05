@@ -24,7 +24,7 @@ public class SalespersonService {
         return orderService.claimOrder(orderId, salesperson);
     }
 
-    public Order updateOrderStatus(Long orderId, Order.OrderStatus status) {
+    public Order updateOrderStatus(Long orderId, Order.OrderStatus status, User currentUser) {
         return orderService.updateOrderStatus(orderId, status);
     }
 }

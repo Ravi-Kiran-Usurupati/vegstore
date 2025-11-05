@@ -62,6 +62,93 @@ async function loadSalesChart() {
 }
 
 // Profit Analysis Chart
+//async function loadProfitChart() {
+//    try {
+//        const response = await fetch('/admin/api/profit-analysis');
+//        const data = await response.json();
+//
+//        const ctx = document.getElementById('profitChart').getContext('2d');
+//        new Chart(ctx, {
+//            type: 'doughnut',
+//            data: {
+//                labels: ['Revenue', 'COGS', 'Profit'],
+//                datasets: [{
+//                    data: [data.revenue, data.cogs, data.profit],
+//                    backgroundColor: [
+//                        'rgba(54, 162, 235, 0.8)',
+//                        'rgba(255, 99, 132, 0.8)',
+//                        'rgba(75, 192, 192, 0.8)'
+//                    ],
+//                    borderWidth: 2
+//                }]
+//            },
+//            options: {
+//                responsive: true,
+//                maintainAspectRatio: true,
+//                plugins: {
+//                    legend: {
+//                        position: 'bottom'
+//                    },
+//                    tooltip: {
+//                        callbacks: {
+//                            label: function(context) {
+//                                return context.label + ': ₹' + context.parsed.toFixed(2);
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        });
+//    } catch (error) {
+//        console.error('Error loading profit chart:', error);
+//    }
+//}
+//
+//// Salesperson Performance Chart
+//async function loadPerformanceChart() {
+//    try {
+//        const response = await fetch('/admin/api/salesperson-performance');
+//        const data = await response.json();
+//
+//        const labels = Object.keys(data);
+//        const values = Object.values(data);
+//
+//        const ctx = document.getElementById('performanceChart').getContext('2d');
+//        new Chart(ctx, {
+//            type: 'bar',
+//            data: {
+//                labels: labels,
+//                datasets: [{
+//                    label: 'Orders Completed',
+//                    data: values,
+//                    backgroundColor: 'rgba(153, 102, 255, 0.8)',
+//                    borderColor: 'rgb(153, 102, 255)',
+//                    borderWidth: 1
+//                }]
+//            },
+//            options: {
+//                responsive: true,
+//                maintainAspectRatio: true,
+//                plugins: {
+//                    legend: {
+//                        display: false
+//                    }
+//                },
+//                scales: {
+//                    y: {
+//                        beginAtZero: true,
+//                        ticks: {
+//                            stepSize: 1
+//                        }
+//                    }
+//                }
+//            }
+//        });
+//    } catch (error) {
+//        console.error('Error loading performance chart:', error);
+//    }
+//}
+
 async function loadProfitChart() {
     try {
         const response = await fetch('/admin/api/profit-analysis');
@@ -71,12 +158,13 @@ async function loadProfitChart() {
         new Chart(ctx, {
             type: 'doughnut',
             data: {
-                labels: ['Revenue', 'COGS', 'Profit'],
+                labels: ['Revenue', 'COGS', 'Salary Expense', 'Profit'],
                 datasets: [{
-                    data: [data.revenue, data.cogs, data.profit],
+                    data: [data.revenue, data.cogs, data.salary, data.profit],
                     backgroundColor: [
                         'rgba(54, 162, 235, 0.8)',
                         'rgba(255, 99, 132, 0.8)',
+                        'rgba(255, 206, 86, 0.8)', // Yellow for salary
                         'rgba(75, 192, 192, 0.8)'
                     ],
                     borderWidth: 2
@@ -104,47 +192,3 @@ async function loadProfitChart() {
     }
 }
 
-// Salesperson Performance Chart
-async function loadPerformanceChart() {
-    try {
-        const response = await fetch('/admin/api/salesperson-performance');
-        const data = await response.json();
-
-        const labels = Object.keys(data);
-        const values = Object.values(data);
-
-        const ctx = document.getElementById('performanceChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Orders Completed',
-                    data: values,
-                    backgroundColor: 'rgba(153, 102, 255, 0.8)',
-                    borderColor: 'rgb(153, 102, 255)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            stepSize: 1
-                        }
-                    }
-                }
-            }
-        });
-    } catch (error) {
-        console.error('Error loading performance chart:', error);
-    }
-}

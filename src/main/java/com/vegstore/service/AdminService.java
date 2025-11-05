@@ -2,7 +2,9 @@ package com.vegstore.service;
 
 import com.vegstore.entity.Order;
 import com.vegstore.entity.OrderItem;
+import com.vegstore.entity.User;
 import com.vegstore.repository.OrderRepository;
+import com.vegstore.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -10,6 +12,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +21,23 @@ public class AdminService {
 
     private final OrderRepository orderRepository;
     private final OrderService orderService;
+    private final UserRepository userRepository;
+
+    // Map salespersonId -> accumulated salary amount
+    private final Map<Long, BigDecimal> salespersonSalaries = new ConcurrentHashMap<>();
+
+    public void addSalespersonSalary(User salesperson, BigDecimal salary) {
+        salespersonSalaries.merge(salesperson.getId(), salary, BigDecimal::add);
+    }
+
+    // For showing in charts and analytics: salesperson name -> salary earned
+    public Map<String, BigDecimal> getSalespersonSalaries() {
+        Map<String, BigDecimal> salaries = new HashMap<>();
+        salespersonSalaries.forEach((id, amount) -> {
+            userRepository.findById(id).ifPresent(user -> salaries.put(user.getFullName(), amount));
+        });
+        return salaries;
+    }
 
     public Map<String, BigDecimal> getSalesTrend(int days) {
         LocalDateTime startDate = LocalDateTime.now().minusDays(days);
@@ -61,6 +81,7 @@ public class AdminService {
 
         BigDecimal totalRevenue = BigDecimal.ZERO;
         BigDecimal totalCogs = BigDecimal.ZERO;
+        BigDecimal totalSalaryExpense = BigDecimal.ZERO;
 
         for (Order order : allOrders) {
             if (order.getStatus() != Order.OrderStatus.CANCELLED) {
@@ -72,16 +93,24 @@ public class AdminService {
                     BigDecimal itemCogs = itemRevenue.subtract(itemProfit);
                     totalCogs = totalCogs.add(itemCogs);
                 }
+
+                if (order.getStatus() == Order.OrderStatus.COMPLETED && order.getSalesperson() != null) {
+                    totalSalaryExpense = totalSalaryExpense.add(order.getTotalAmount().multiply(BigDecimal.valueOf(0.1)));
+                }
             }
         }
 
-        BigDecimal profit = totalRevenue.subtract(totalCogs);
+        BigDecimal grossProfit = totalRevenue.subtract(totalCogs);
+        BigDecimal netProfit = grossProfit.subtract(totalSalaryExpense);
 
         Map<String, BigDecimal> analysis = new LinkedHashMap<>();
         analysis.put("revenue", totalRevenue);
         analysis.put("cogs", totalCogs);
-        analysis.put("profit", profit);
+        analysis.put("salary", totalSalaryExpense);  // <---- Salary for chart
+        analysis.put("profit", netProfit);
 
         return analysis;
     }
+
+
 }
