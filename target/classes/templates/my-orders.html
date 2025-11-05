@@ -44,8 +44,8 @@
                 <li class="nav-item" sec:authorize="hasRole('CUSTOMER')">
                     <a class="nav-link px-3 active" th:href="@{/my-orders}"><i class="bi bi-box-seam me-1"></i> My Orders</a>
                 </li>
-                <li class="nav-item dropdown ms-2" sec:authorize="isAuthenticated()">
-                    <a class="nav-link dropdown-toggle btn btn-outline-light rounded-pill px-3" href="#" role="button" data-bs-toggle="dropdown">
+                <li class="nav-item  ms-2" sec:authorize="isAuthenticated()">
+                    <a class="nav-link  btn btn-outline-dark rounded-pill px-3" href="#" role="button" data-bs-toggle="dropdown">
                         <i class="bi bi-person-circle me-1"></i>
                         <span th:text="${currentUser?.fullName}">User</span>
                     </a>

@@ -53,8 +53,8 @@
                 </li>
 
                 <!-- Authenticated User -->
-                <li class="nav-item dropdown ms-2" sec:authorize="isAuthenticated()">
-                    <a class="nav-link dropdown-toggle btn btn-outline-light rounded-pill px-3"
+                <li class="nav-item  ms-2" sec:authorize="isAuthenticated()">
+                    <a class="nav-link  btn btn-outline-dark rounded-pill px-3"
                        href="#" role="button" data-bs-toggle="dropdown">
                         <i class="bi bi-person-circle me-1"></i>
                         <span th:text="${currentUser?.fullName}">User</span>

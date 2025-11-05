@@ -3,9 +3,11 @@ package com.vegstore.config;
 import com.vegstore.entity.User;
 import com.vegstore.entity.Supplier;
 import com.vegstore.entity.Product;
+import com.vegstore.entity.Purchase;
 import com.vegstore.repository.UserRepository;
 import com.vegstore.repository.SupplierRepository;
 import com.vegstore.repository.ProductRepository;
+import com.vegstore.repository.PurchaseRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -14,6 +16,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Configuration
 @RequiredArgsConstructor
@@ -23,36 +26,37 @@ public class CreateAdminUser {
     private final UserRepository userRepository;
     private final SupplierRepository supplierRepository;
     private final ProductRepository productRepository;
+    private final PurchaseRepository purchaseRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Bean
     public CommandLineRunner initializeData() {
         return args -> {
-
             log.info("Starting Database Initialization...");
 
-            // Create Users (Admin, Sales, Customers)
-            createUsers();
+            // Check if admin exists to avoid recreating data
+            if (userRepository.findByUsername("admin").isEmpty()) {
+                // Create Users (Admin, Sales, Customers)
+                createUsers();
 
-            // Create Suppliers
-            createSuppliers();
+                // Create Suppliers
+                createSuppliers();
 
-            // Create Products
-            createProducts();
+                // Create Products
+                createProducts();
 
+                // Create Purchase Data for COGS calculations
+                createPurchaseData();
 
-            log.info("Database Initialization Complete!");
-
-            printLoginCredentials();
+                log.info("Database Initialization Complete!");
+                printLoginCredentials();
+            } else {
+                log.info("Admin user already exists. Skipping data initialization.");
+            }
         };
     }
 
     private void createUsers() {
-        if (userRepository.count() > 0) {
-            log.info("Users already exist, skipping user creation");
-            return;
-        }
-
         log.info("Creating users...");
 
         String adminPassword = passwordEncoder.encode("admin123");
@@ -136,11 +140,6 @@ public class CreateAdminUser {
     }
 
     private void createSuppliers() {
-        if (supplierRepository.count() > 0) {
-            log.info("Suppliers already exist, skipping");
-            return;
-        }
-
         log.info("Creating suppliers from Vijayawada, AP...");
 
         // Supplier 1 - Ganesh
@@ -180,11 +179,6 @@ public class CreateAdminUser {
     }
 
     private void createProducts() {
-        if (productRepository.count() > 0) {
-            log.info("Products already exist, skipping");
-            return;
-        }
-
         log.info("Creating products...");
 
         // Get suppliers
@@ -246,10 +240,6 @@ public class CreateAdminUser {
                 .build();
         productRepository.save(spinach);
 
-
-
-
-
         // Products from Swaroop Vegetable Suppliers
         Product capsicum = Product.builder()
                 .name("Capsicum (Shimla Mirchi)")
@@ -303,15 +293,137 @@ public class CreateAdminUser {
                 .build();
         productRepository.save(cucumber);
 
-
-
-
-
         log.info(" Created {} products", productRepository.count());
     }
 
-    private void printLoginCredentials() {
+    private void createPurchaseData() {
+        log.info("Creating purchase data for COGS calculations...");
 
+        // Get products
+        Product tomato = productRepository.findByName("Tomatoes").orElse(null);
+        Product potato = productRepository.findByName("Potatoes").orElse(null);
+        Product onion = productRepository.findByName("Onions").orElse(null);
+        Product spinach = productRepository.findByName("Spinach (Palak)").orElse(null);
+        Product capsicum = productRepository.findByName("Capsicum (Shimla Mirchi)").orElse(null);
+        Product carrot = productRepository.findByName("Carrots").orElse(null);
+        Product cabbage = productRepository.findByName("Cabbage (Gobi)").orElse(null);
+        Product cucumber = productRepository.findByName("Cucumber (Dosakaya)").orElse(null);
+
+        // Get suppliers
+        Supplier ganesh = supplierRepository.findById(1L).orElse(null);
+        Supplier koti = supplierRepository.findById(2L).orElse(null);
+        Supplier swaroop = supplierRepository.findById(3L).orElse(null);
+
+        // Create purchase records for ALL products (for COGS calculation)
+        if (tomato != null && ganesh != null) {
+            Purchase tomatoPurchase = Purchase.builder()
+                    .product(tomato)
+                    .supplier(ganesh)
+                    .quantityKg(150.0)
+                    .costPerKg(new BigDecimal("25.00"))
+                    .totalAmount(new BigDecimal("3750.00")) // Changed from totalCost to totalAmount
+                    .purchaseDate(LocalDateTime.now().minusDays(7))
+                    .build();
+            purchaseRepository.save(tomatoPurchase);
+            log.info(" Created purchase record for Tomatoes");
+        }
+
+        if (potato != null && ganesh != null) {
+            Purchase potatoPurchase = Purchase.builder()
+                    .product(potato)
+                    .supplier(ganesh)
+                    .quantityKg(200.0)
+                    .costPerKg(new BigDecimal("18.00"))
+                    .totalAmount(new BigDecimal("3600.00")) // Changed from totalCost to totalAmount
+                    .purchaseDate(LocalDateTime.now().minusDays(6))
+                    .build();
+            purchaseRepository.save(potatoPurchase);
+            log.info(" Created purchase record for Potatoes");
+        }
+
+        if (onion != null && ganesh != null) {
+            Purchase onionPurchase = Purchase.builder()
+                    .product(onion)
+                    .supplier(ganesh)
+                    .quantityKg(180.0)
+                    .costPerKg(new BigDecimal("22.00"))
+                    .totalAmount(new BigDecimal("3960.00")) // Changed from totalCost to totalAmount
+                    .purchaseDate(LocalDateTime.now().minusDays(5))
+                    .build();
+            purchaseRepository.save(onionPurchase);
+            log.info(" Created purchase record for Onions");
+        }
+
+        if (spinach != null && koti != null) {
+            Purchase spinachPurchase = Purchase.builder()
+                    .product(spinach)
+                    .supplier(koti)
+                    .quantityKg(80.0)
+                    .costPerKg(new BigDecimal("30.00"))
+                    .totalAmount(new BigDecimal("2400.00")) // Changed from totalCost to totalAmount
+                    .purchaseDate(LocalDateTime.now().minusDays(4))
+                    .build();
+            purchaseRepository.save(spinachPurchase);
+            log.info(" Created purchase record for Spinach");
+        }
+
+        if (capsicum != null && swaroop != null) {
+            Purchase capsicumPurchase = Purchase.builder()
+                    .product(capsicum)
+                    .supplier(swaroop)
+                    .quantityKg(90.0)
+                    .costPerKg(new BigDecimal("45.00"))
+                    .totalAmount(new BigDecimal("4050.00")) // Changed from totalCost to totalAmount
+                    .purchaseDate(LocalDateTime.now().minusDays(3))
+                    .build();
+            purchaseRepository.save(capsicumPurchase);
+            log.info(" Created purchase record for Capsicum");
+        }
+
+        if (carrot != null && swaroop != null) {
+            Purchase carrotPurchase = Purchase.builder()
+                    .product(carrot)
+                    .supplier(swaroop)
+                    .quantityKg(130.0)
+                    .costPerKg(new BigDecimal("30.00"))
+                    .totalAmount(new BigDecimal("3900.00")) // Changed from totalCost to totalAmount
+                    .purchaseDate(LocalDateTime.now().minusDays(2))
+                    .build();
+            purchaseRepository.save(carrotPurchase);
+            log.info(" Created purchase record for Carrots");
+        }
+
+        if (cabbage != null && swaroop != null) {
+            Purchase cabbagePurchase = Purchase.builder()
+                    .product(cabbage)
+                    .supplier(swaroop)
+                    .quantityKg(140.0)
+                    .costPerKg(new BigDecimal("20.00"))
+                    .totalAmount(new BigDecimal("2800.00")) // Changed from totalCost to totalAmount
+                    .purchaseDate(LocalDateTime.now().minusDays(1))
+                    .build();
+            purchaseRepository.save(cabbagePurchase);
+            log.info(" Created purchase record for Cabbage");
+        }
+
+        if (cucumber != null && swaroop != null) {
+            Purchase cucumberPurchase = Purchase.builder()
+                    .product(cucumber)
+                    .supplier(swaroop)
+                    .quantityKg(110.0)
+                    .costPerKg(new BigDecimal("25.00"))
+                    .totalAmount(new BigDecimal("2750.00")) // Changed from totalCost to totalAmount
+                    .purchaseDate(LocalDateTime.now().minusDays(1))
+                    .build();
+            purchaseRepository.save(cucumberPurchase);
+            log.info(" Created purchase record for Cucumber");
+        }
+
+        log.info("Created purchase data for all 8 products for COGS calculations");
+        log.info("Total purchase records created: {}", purchaseRepository.count());
+    }
+
+    private void printLoginCredentials() {
         log.info("               GREENBASKET - LOGIN CREDENTIALS          ");
         log.info("");
         log.info("                                                             ");
@@ -341,6 +453,8 @@ public class CreateAdminUser {
         log.info("     3. Swaroop Vegetable Suppliers ( Vijayawada)          ");
         log.info("                                                             ");
         log.info("   PRODUCTS: 8 fresh vegetables         ");
+        log.info("   PURCHASE DATA: Added for all 8 products (COGS calculations)");
+        log.info("   TOTAL INVESTMENT: ₹27,210 in inventory                   ");
         log.info("                                                            ");
 
         log.info(" Access the application at: http://localhost:8081");
