@@ -6,6 +6,8 @@ import com.vegstore.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -165,14 +167,32 @@ public class AdminController {
     @PostMapping("/products/delete/{id}")
     public String deleteProduct(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
-            productService.deleteProduct(id);
-            redirectAttributes.addFlashAttribute("success", "Product deleted successfully");
+            Optional<Product> optionalProduct = productService.getproductById(id);
+            if (optionalProduct.isPresent()) {
+                Product product = optionalProduct.get();
+                product.setStockKg(0.0); // Soft delete by emptying stock
+                // Do *not* change "active"
+                productService.updateProduct(product);
+                redirectAttributes.addFlashAttribute("success", "Product stock set to 0 (soft-deleted)");
+            } else {
+                redirectAttributes.addFlashAttribute("error", "Product not found");
+            }
         } catch (Exception e) {
-            log.error("Error deleting product: {}", e.getMessage());
-            redirectAttributes.addFlashAttribute("error", "Error deleting product: " + e.getMessage());
+            log.error("Error soft-deleting product: {}", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Error soft-deleting product: " + e.getMessage());
         }
-
         return "redirect:/admin/products";
+    }
+
+    // REST endpoint to fetch product for edit (used by AJAX)
+    @GetMapping("/products/{id}")
+    @ResponseBody
+    public ResponseEntity<?> getProduct(@PathVariable Long id) {
+        Optional<Product> optionalProduct = productService.getproductById(id);
+        if (optionalProduct.isPresent()) {
+            return ResponseEntity.ok(optionalProduct.get());
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found");
     }
 
     // ========== SUPPLIERS ==========
