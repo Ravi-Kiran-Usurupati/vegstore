@@ -63,11 +63,11 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> {
-                    log.error("❌ USER NOT FOUND: {}", username);
+                    log.error(" USER NOT FOUND: {}", username);
                     return new UsernameNotFoundException("User not found: " + username);
                 });
 
-        log.info("✅ USER FOUND: {}", user.getUsername());
+        log.info(" USER FOUND: {}", user.getUsername());
         log.info("Role: {}", user.getRole());
         log.info("Password hash (first 20 chars): {}", user.getPassword().substring(0, 20));
 
@@ -79,7 +79,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(
                 user.getUsername(),
                 user.getPassword(),
-                true, // enabled
+                user.getActive(), // enabled
                 true, // accountNonExpired
                 true, // credentialsNonExpired
                 true, // accountNonLocked

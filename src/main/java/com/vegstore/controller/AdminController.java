@@ -15,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -414,31 +415,30 @@ public class AdminController {
         return "redirect:/admin/users?updated=true";
     }
 
-    @DeleteMapping("/users/{id}")
-    @ResponseBody
-    public Map<String, String> deleteUser(@PathVariable Long id) {
-        Map<String, String> response = new HashMap<>();
+    @Transactional
+    @PostMapping("/users/toggle-status/{id}")
+    public String toggleUserStatus(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        log.info("Attempting to TOGGLE status for user with ID: {}", id);
 
         try {
-            Optional<User> userOpt = userRepository.findById(id);
-            if (userOpt.isEmpty()) {
-                response.put("error", "User not found");
-                return response;
-            }
+            User user = userRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
 
-            User user = userOpt.get();
+            // This line toggles the active status
+            boolean newStatus = !user.getActive();
+            user.setActive(newStatus);
 
-            // Prevent deletion of current admin user
-            // You might want to add additional checks here
+            userRepository.save(user);
 
-            userRepository.delete(user);
-            response.put("success", "User deleted successfully");
+            String action = newStatus ? "activated" : "deactivated";
+            log.info("User {} successfully {}.", user.getUsername(), action);
+            redirectAttributes.addFlashAttribute("success", "User " + user.getUsername() + " " + action + " successfully.");
 
         } catch (Exception e) {
-            log.error("Error deleting user: {}", e.getMessage());
-            response.put("error", "Error deleting user: " + e.getMessage());
+            log.error("Error toggling user status: {}", e.getMessage(), e);
+            redirectAttributes.addFlashAttribute("error", "Error toggling user status: " + e.getMessage());
         }
 
-        return response;
+        return "redirect:/admin/users";
     }
 }

@@ -41,6 +41,9 @@ public class User {
     @Column(name = "created_at")
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean active = true;
 
     public Boolean getIsWholesale() {
         return isWholesale;
@@ -56,5 +59,22 @@ public class User {
 
     public enum Role {
         ADMIN, SALESPERSON, CUSTOMER
+    }
+    @PrePersist
+    protected void onCreate() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+        if (active == null) {
+            active = true;
+        }
+    }
+
+    public Boolean getActive() {
+        return this.active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 }
