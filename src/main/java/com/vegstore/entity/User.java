@@ -42,6 +42,18 @@ public class User {
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    public Boolean getIsWholesale() {
+        return isWholesale;
+    }
+
+    public void setIsWholesale(Boolean isWholesale) {
+        this.isWholesale = isWholesale;
+    }
+
+    public Boolean isWholesale() {
+        return isWholesale;
+    }
+
     public enum Role {
         ADMIN, SALESPERSON, CUSTOMER
     }
