@@ -64,17 +64,19 @@ public class AdminService {
     }
 
     public Map<String, Long> getSalespersonPerformance() {
-        List<Object[]> results = orderRepository.getSalespersonPerformance();
+        List<Order> allOrders = orderRepository.findAll();
+        Map<String, Long> performanceMap = new LinkedHashMap<>();
 
-        Map<String, Long> performance = new LinkedHashMap<>();
-        for (Object[] result : results) {
-            com.vegstore.entity.User salesperson = (com.vegstore.entity.User) result[0];
-            Long orderCount = (Long) result[1];
-            performance.put(salesperson.getFullName(), orderCount);
+        for (Order order : allOrders) {
+            // Only consider completed orders
+            if (order.getStatus() == Order.OrderStatus.COMPLETED && order.getSalesperson() != null) {
+                String name = order.getSalesperson().getFullName();
+                performanceMap.put(name, performanceMap.getOrDefault(name, 0L) + 1);
+            }
         }
-
-        return performance;
+        return performanceMap;
     }
+
 
     public Map<String, BigDecimal> getProfitAnalysis() {
         List<Order> allOrders = orderRepository.findAll();

@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -50,33 +51,44 @@ public class AdminController {
         return "admin/dashboard";
     }
 
-     @GetMapping("/users")
-     public String usersManagement(Model model, @AuthenticationPrincipal User currentUser) {
+    @GetMapping("/users")
+    public String usersManagement(Model model, @AuthenticationPrincipal User currentUser) {
         try {
-        log.info("Starting users management endpoint...");
+            log.info("Starting users management endpoint...");
 
-        List<User> users = userRepository.findAll();
-        log.info("Found {} users", users.size());
+            // Get ALL users (both active and inactive)
+            List<User> users = userRepository.findAll();
+            log.info("Found {} users", users.size());
 
-        Map<String, Long> userStats = new HashMap<>();
-        userStats.put("totalUsers", userRepository.count());
-        userStats.put("customers", userRepository.countByRole(User.Role.CUSTOMER));
-        userStats.put("salespersons", userRepository.countByRole(User.Role.SALESPERSON));
-        userStats.put("admins", userRepository.countByRole(User.Role.ADMIN));
+            Map<String, Long> userStats = new HashMap<>();
+            userStats.put("totalUsers", userRepository.count());
+            userStats.put("customers", userRepository.countByRole(User.Role.CUSTOMER));
+            userStats.put("salespersons", userRepository.countByRole(User.Role.SALESPERSON));
+            userStats.put("admins", userRepository.countByRole(User.Role.ADMIN));
 
-        model.addAttribute("users", users);
-        model.addAttribute("userStats", userStats);
-        model.addAttribute("currentUser", currentUser);
+            // Add active user counts
+            userStats.put("activeUsers", userRepository.countByActiveTrue());
+            userStats.put("inactiveUsers", userRepository.countByActiveFalse());
 
-        log.info("Users management endpoint completed successfully");
-        return "admin/admin-users";
+            model.addAttribute("users", users);
+            model.addAttribute("userStats", userStats);
+            model.addAttribute("currentUser", currentUser);
+
+            CsrfToken csrfToken = (CsrfToken) model.getAttribute("_csrf");
+            if (csrfToken != null) {
+                model.addAttribute("csrfToken", csrfToken.getToken());
+                model.addAttribute("csrfHeader", csrfToken.getHeaderName());
+            }
+
+            log.info("Users management endpoint completed successfully");
+            return "admin/admin-users";
 
         } catch (Exception e) {
-        log.error("Error in users management: ", e);
-        model.addAttribute("error", "Error loading users: " + e.getMessage());
-        return "admin/admin-users";
+            log.error("Error in users management: ", e);
+            model.addAttribute("error", "Error loading users: " + e.getMessage());
+            return "admin/admin-users";
+        }
     }
-}
 
     @PostMapping("/users/create")
     public String createUser(@RequestParam String fullName,
@@ -415,30 +427,114 @@ public class AdminController {
         return "redirect:/admin/users?updated=true";
     }
 
-    @Transactional
-    @PostMapping("/users/toggle-status/{id}")
-    public String toggleUserStatus(@PathVariable Long id, RedirectAttributes redirectAttributes) {
-        log.info("Attempting to TOGGLE status for user with ID: {}", id);
+//    @Transactional
+//    @PostMapping("/users/toggle-status/{id}")
+//    public String toggleUserStatus(@PathVariable Long id,
+//                                   @AuthenticationPrincipal User currentUser,
+//                                   RedirectAttributes redirectAttributes) {
+//        log.info("Attempting to TOGGLE status for user with ID: {}", id);
+//
+//        try {
+//            User user = userRepository.findById(id)
+//                    .orElseThrow(() -> new RuntimeException("User not found"));
+//
+//            // Check: Only admin can do this
+//            if (currentUser.getRole() != User.Role.ADMIN) {
+//                redirectAttributes.addFlashAttribute("error", "Only admins can change user status.");
+//                return "redirect:/admin/users";
+//            }
+//
+//            // Prevent self-deactivation
+//            if (user.getId().equals(currentUser.getId())) {
+//                redirectAttributes.addFlashAttribute("error", "You cannot deactivate your own admin account.");
+//                return "redirect:/admin/users";
+//            }
+//
+//            // Toggle status
+//            boolean newStatus = !user.getActive();
+//            user.setActive(newStatus);
+//
+//            userRepository.save(user);
+//
+//            String action = newStatus ? "activated" : "deactivated";
+//            log.info("User {} successfully {}.", user.getUsername(), action);
+//            redirectAttributes.addFlashAttribute("success", "User " + user.getUsername() + " " + action + " successfully.");
+//
+//        } catch (Exception e) {
+//            log.error("Error toggling user status: {}", e.getMessage(), e);
+//            redirectAttributes.addFlashAttribute("error", "Error toggling user status: " + e.getMessage());
+//        }
+//
+//        return "redirect:/admin/users";
+//    }
+@Transactional
+@PostMapping("/users/toggle-status/{id}")
+public String toggleUserStatus(@PathVariable Long id,
+                               @AuthenticationPrincipal User currentUser,
+                               RedirectAttributes redirectAttributes) {
+    log.info("Attempting to TOGGLE status for user with ID: {}", id);
 
-        try {
-            User user = userRepository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+    try {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-            // This line toggles the active status
-            boolean newStatus = !user.getActive();
-            user.setActive(newStatus);
+        // Debug: log current status
+        log.info("User {} current active status: {}", user.getUsername(), user.getActive());
 
-            userRepository.save(user);
-
-            String action = newStatus ? "activated" : "deactivated";
-            log.info("User {} successfully {}.", user.getUsername(), action);
-            redirectAttributes.addFlashAttribute("success", "User " + user.getUsername() + " " + action + " successfully.");
-
-        } catch (Exception e) {
-            log.error("Error toggling user status: {}", e.getMessage(), e);
-            redirectAttributes.addFlashAttribute("error", "Error toggling user status: " + e.getMessage());
+        // Check: Only admin can do this
+        if (currentUser.getRole() != User.Role.ADMIN) {
+            redirectAttributes.addFlashAttribute("error", "Only admins can change user status.");
+            return "redirect:/admin/users";
         }
 
+        // Prevent self-deactivation
+        if (user.getId().equals(currentUser.getId())) {
+            redirectAttributes.addFlashAttribute("error", "You cannot deactivate your own admin account.");
+            return "redirect:/admin/users";
+        }
+
+        // Toggle status
+        boolean newStatus = !user.getActive();
+        user.setActive(newStatus);
+
+        userRepository.save(user);
+
+        // Debug: log new status
+        log.info("User {} new active status: {}", user.getUsername(), user.getActive());
+
+        String action = newStatus ? "activated" : "deactivated";
+        log.info("User {} successfully {}.", user.getUsername(), action);
+        redirectAttributes.addFlashAttribute("success", "User " + user.getUsername() + " " + action + " successfully.");
+
+    } catch (Exception e) {
+        log.error("Error toggling user status: {}", e.getMessage(), e);
+        redirectAttributes.addFlashAttribute("error", "Error toggling user status: " + e.getMessage());
+    }
+
+    return "redirect:/admin/users";
+}
+    @PostMapping("/users/delete/{id}")
+    public String deleteUser(@PathVariable Long id, @AuthenticationPrincipal User currentUser, RedirectAttributes redirectAttributes) {
+        User userToDelete = userRepository.findById(id).orElse(null);
+        if (userToDelete == null) {
+            redirectAttributes.addFlashAttribute("error", "User not found.");
+            return "redirect:/admin/users";
+        }
+
+        if (!User.Role.ADMIN.equals(currentUser.getRole())) {
+            redirectAttributes.addFlashAttribute("error", "Only admins can delete users.");
+            return "redirect:/admin/users";
+        }
+
+        if (currentUser.getId().equals(userToDelete.getId())) {
+            redirectAttributes.addFlashAttribute("error", "You cannot delete your own admin account.");
+            return "redirect:/admin/users";
+        }
+
+        userRepository.delete(userToDelete);
+        redirectAttributes.addFlashAttribute("success", "User deleted successfully.");
         return "redirect:/admin/users";
     }
+
+
 }

@@ -103,4 +103,57 @@ async function loadProfitChart() {
         console.error('Error loading profit chart:', error);
     }
 }
+async function loadPerformanceChart() {
+    try {
+        const response = await fetch('/admin/api/salesperson-performance');
+        const data = await response.json();
+
+        const labels = Object.keys(data);
+        const values = Object.values(data);
+
+        const ctx = document.getElementById('performanceChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Completed Orders',
+                    data: values,
+                    backgroundColor: 'rgba(255, 122, 112, 0.3)',
+                    borderColor: 'rgba(255, 122, 112, 0.4)',
+                    borderWidth: 1,
+                    barPercentage: 0.5,
+                    categoryPercentage: 0.6,
+                }]
+            },
+            options: {
+                indexAxis: 'y', // makes horizontal bar chart for compact look
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.label}: ${context.parsed.x}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        ticks: { stepSize: 1 }
+                    },
+                    y: {
+                        ticks: { font: { size: 12 } }
+                    }
+                }
+            }
+        });
+
+    } catch (error) {
+        console.error('Error loading performance chart:', error);
+    }
+}
 
